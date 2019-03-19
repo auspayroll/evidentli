@@ -1,25 +1,22 @@
 <template>
   <div>
         <form>
-            <h4>-Rondo Configurations-</h4>
+            <h4>-SUMO Configurations-</h4>
 
         <form v-on:submit="add">
         <input name="new_cohort" type="text" placeholder="processor name" ref="name" v-model="name"> 
-        <button type="button" class="btn btn-primary" @click="add">Add Cohort Processor</button> 
+        <button type="button" class="btn btn-primary" @click="add">Add SUMO Processor</button> 
         <div v-show="error" class="alert-danger">{{ error }}</div>
         </form>
         <p/>
         <table class="table table-striped table-hover">
-            <tr><th>Id</th><th>Name</th><th>No. Cohorts</th></tr>
+            <tr><th>Id</th><th>Name</th></tr>
             <tr v-for="config in configs">
                 <td>
-                    <router-link :to="{ name: 'cohort', params: { id: config._id }}">{{config.name || config._id}}</router-link>
+                    <router-link :to="{ name: 'sumo', params: { id: config._id }}">{{config._id}}</router-link>
                 </td>        
                 <td>
                     {{ config.name }}
-                </td>
-                <td>
-                    {{ config.no_cohorts }}
                 </td>
             </tr>
         </table>
@@ -44,13 +41,9 @@
       }
     },
     created(){
-        axios.interceptors.request.use(request => {
-            console.log('Starting Request', request)
-            return request
-        });
         axios.get(this.configsURL).then( 
             response => { 
-                this.configs = response.data.filter(config => config.type === 'rondo')  
+                this.configs = response.data.filter(config => config.type === 'sumo')  
                 console.log(response.data)
             }
         ).catch(error => {
@@ -64,7 +57,7 @@
     },
     methods: {
       add(e){
-          var new_cohort = { name: this.name, no_cohorts: 0, cohorts: [], matched_pairs: [], type: 'rondo'};
+          var new_cohort = { name: this.name, type: 'sumo'};
           axios.post(this.configsURL, 
             [new_cohort]).then( response => {
                 new_cohort["_id"] = response.data[0];

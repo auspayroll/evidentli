@@ -4,15 +4,17 @@
 
     <div id="content">
       <div id="sidebar">
-        <router-link :to="{ name: 'cohort', params: { id: id }}">Cohorts</router-link>
-        <router-link to="/matched">Matched Pairs</router-link>
-        <router-link to="/configs">Configs</router-link>
+        <h3>{{ projectId }}</h3>
+        <!--<router-link :to="{ name: 'cohort', params: { id: id }}">Cohorts</router-link>-->
+        <router-link :to="{ name: 'rondo' }">RONDO</router-link>
+        <router-link :to="{ name: 'sumos' }">SUMO</router-link>
 
       </div>
    
       <div id="main">
+        <h3>Project {{ projectId }}</h3>
         <transition name="fade" mode="out-in">
-          <router-view :apiUrl="apiUrl" :projectId="projectId"></router-view>
+          <router-view :projectId="projectId"></router-view>
         </transition>
       </div>
     </div>
@@ -22,13 +24,12 @@
 
 <script>
   import axios from 'axios';
+  axios.defaults.baseURL = 'http://localhost:8082';
   export default {
     name: 'app',
     data () {
       return {
-        projectId: 'ehr_demo', 
-        apiUrl: 'http://localhost:8081', 
-        id: '456'
+        projectId: 'ehr_demo'
       }
     }
   }
@@ -70,7 +71,9 @@ a {
   color: #42b983;
 }
 
-
+      .alert-success{
+        padding: 4px;
+      }
       .wrapper {
 
       }
@@ -80,7 +83,7 @@ a {
       }
 
       #sidebar {
-        padding-top: 77px;
+        padding-top: 15px;
         background: #eaedeb;
         position: fixed;
         top: 0;
@@ -141,6 +144,14 @@ a {
         background: #000;
 
       }
+
+  .panel{
+    border: 0pt #cccccc solid;
+    border-radius: 5px;
+    padding: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 15px;
+  }
 
   .fade-enter {
     opacity: 0;
