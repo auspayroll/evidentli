@@ -2,4 +2,5 @@ venv/
 __pycache__
 rondo.egg-info/
 **node_modules/
-
+.idea*
+*.py[cod]
