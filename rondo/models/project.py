@@ -1,37 +1,33 @@
 from .model import Model
+from .patient import Patient
+from rondo import piano_api as api
 
-class Project(Model):
+
+class Project(object):
+	def __init__(self, project_id, *args, **kwargs):
+		self._id = project_id
+		self._patients = []
+
+	def patients(self, **query):
+		if query:
+			self._patients = Patient(project_id=self._id).filter(**query)
+		else:
+			self._patients = Patient(project_id=self._id).all()
+		return self._patients
+
+
+class ProjectData(Model):
+	_name = "projectdata"
+
 	def __repr__(self):
 		if hasattr(self, "project_title") and hasattr(self, "_id"):
-			return "<Project title: %s>" % self.project_title
+			return "<ProjectData title: %s>" % self.project_title
 		elif hasattr(self, "_id"):
-			return "<Project id: %s>" % self._id
+			return "<ProjectData id: %s>" % self._id
 		else:
-			return "<Project: not loaded>"
+			return "<ProjectData: not loaded>"
 
-	def fetch(self):
-		if self._id:
-			project_data = api.get_project_data(self._id)
-			for k, v in project_data.items():
-				setattr(self, k, v)
-			self._field_updates.clear()
-
-		else:
-			raise Exception("Project id not set")
-
-	def save(self):
-		payload = { _id: self._id, **self._field_updates }
-		api.save_project(self._id, payload)
 
 	@property
 	def patients(self):
-		if hasattr(self, '_patients'):
-			return self._patients
-		else:
-			[]
-
-	def get_patients(self):
-		self._patients = [Patient(**rec) for rec in api.get_patients(self._id)]
-		for patient in self._patients:
-			patient.project_id = self._id
-		return self._patients
+		return Patient.all(project_id=self._project_id)
