@@ -1,9 +1,8 @@
 import hashlib
 import uuid
 import requests
-from rondo import piano_api as api
-from .model import Model
-from .patient import Patient
+from .orm.model import Model
+from .orm.patient import Patient
 
 class Rondo(Model):
     _name = "rondo"
@@ -74,8 +73,4 @@ class Rondo(Model):
             if matched_patient:
                 return [matched_patient]
             else:
-                return []
-
-
-
-                                                                       
+                return []                                                                   

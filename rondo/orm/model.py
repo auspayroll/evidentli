@@ -1,4 +1,4 @@
-from rondo import piano_api as api
+from  rondo.orm import piano_api as api
 
 class Model(object):
 	def __init__(self, *args, **kwargs):

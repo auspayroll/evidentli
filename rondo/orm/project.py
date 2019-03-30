@@ -1,6 +1,5 @@
 from .model import Model
 from .patient import Patient
-from rondo import piano_api as api
 
 
 class Project(object):
@@ -8,7 +7,7 @@ class Project(object):
 		self._id = project_id
 		self._patients = []
 
-	def patients(self, **query):
+	def get_patients(self, **query):
 		if query:
 			self._patients = Patient(project_id=self._id).filter(**query)
 		else:
@@ -26,8 +25,3 @@ class ProjectData(Model):
 			return "<ProjectData id: %s>" % self._id
 		else:
 			return "<ProjectData: not loaded>"
-
-
-	@property
-	def patients(self):
-		return Patient.all(project_id=self._project_id)
