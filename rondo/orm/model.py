@@ -1,8 +1,7 @@
 from  rondo.orm import piano_api as api
 
 class Model(object):
-	def __init__(self, *args, **kwargs):
-		assert 'project_id' in kwargs
+	def __init__(self, project_id, *args, **kwargs):
 		assert 'id' not in kwargs
 		assert '_id' not in kwargs
 		_project_id = kwargs.pop('project_id')
@@ -53,21 +52,19 @@ class Model(object):
 		return items
 
 	@classmethod
-	def get(cls, *args, **kwargs):
+	def get(cls, project_id, id, *args, **kwargs):
 		_id = kwargs.get("id")
 		_project_id = kwargs.get("_project_id", kwargs.get("project_id"))
-		assert _id and _project_id
 		json = api.get_config(_project_id, cls._name, _id)
 		json["_project_id"] = _project_id
 		return cls.create(**json)
 
 	@classmethod
-	def create(cls, *args, **kwargs):
+	def create(cls, _project_id, _id, *args, **kwargs):
 		""" 
 		used to create a model from a json dict with no pending 
 		change updates, ie _field_updates
 		"""
-		assert "_project_id" in kwargs and "_id" in kwargs
 		_id = kwargs.pop('_id')
 		_project_id = kwargs.pop('_project_id')
 		model = cls(*args, **kwargs, project_id=_project_id)
@@ -76,8 +73,7 @@ class Model(object):
 		return model
 
 	@classmethod
-	def filter(cls, *args, **query):
-		assert 'project_id' in query
+	def filter(cls, project_id, *args, **query):
 		project_id = query.pop('project_id')
 		results = api.query_config(project_id, cls._name, query)
 		if results is not None:
