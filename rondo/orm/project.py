@@ -14,6 +14,13 @@ class Project(object):
 			self._patients = Patient(project_id=self._id).all()
 		return self._patients
 
+	@property
+	def patients(self):
+		return self._patients
+
+	def get_patient(self, id):
+		return Patient.get(project_id=self._id, id=id)
+
 
 class ProjectData(Model):
 	_name = "projectdata"

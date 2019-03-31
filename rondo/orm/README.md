@@ -130,11 +130,17 @@ A project object saves having to provide a project key for each query. For examp
 
 ``> patients = Patient.all(project_id)``
 
-Create a project object and use one of the supported convenince methods, or write your own
+Create a project object and use one of the supported convenience methods, or write your own
 
 ``> all_patients = my_project.get_patients()``
 
 ``> b_cohort = my_project.get_patients(cohort="B")``
+
+To return cached patients from previous call to the PIANO API through ``get_patients`` use the ``patients`` attribute
+
+``> my_project.patients``
+
+Subsequent calls to ``get_patients`` will update the cached patients on the project object. 
 
 
 
