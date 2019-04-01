@@ -81,7 +81,7 @@
     },
     computed: {
         configsURL: function(){
-            return '/projects/' + this.projectId + '/python-sandbox'
+            return '/projects/' + this.projectId + '/rondo'
         },
         saveObject: function(){ return { _id: this.id, name: this.config_name, 
           cohorts: this.cohorts, matched_pairs: this.matchedPairs, no_cohorts: this.no_cohorts }
@@ -90,7 +90,6 @@
     },
     methods: {
       updateMatchedPairs(e){
-        console.log(e.target.value);
         if(e.target.checked && !this.matchedPairs.includes(e.target.value)){
             this.matchedPairs.push(e.target.value)
         } else {

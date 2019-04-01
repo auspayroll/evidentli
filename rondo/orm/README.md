@@ -7,6 +7,7 @@ Currently this package currently resides in the [RONDO](../../README.md) reposit
 ---
 
 ## Model classes
+
 A model class represents a configuration collection belonging to Piano projects.
 
 The following model classes are currently defined:

@@ -1,11 +1,11 @@
 from  rondo.orm import piano_api as api
 
+
 class Model(object):
 	def __init__(self, project_id, *args, **kwargs):
 		assert 'id' not in kwargs
 		assert '_id' not in kwargs
-		_project_id = kwargs.pop('project_id')
-		setattr(self, '_project_id', _project_id)
+		setattr(self, '_project_id', project_id)
 		self._field_updates = {}
 
 		#check for allowable fields are of the correct type
@@ -43,6 +43,9 @@ class Model(object):
 				pass
 		super().__setattr__(name, value)
 
+	def __iter__(self):
+		return iter([1,2])
+
 	@property
 	def _json(self):
 		items = { "_id": self._id, "_project_id": self._project_id }
@@ -52,12 +55,14 @@ class Model(object):
 		return items
 
 	@classmethod
-	def get(cls, project_id, id, *args, **kwargs):
-		_id = kwargs.get("id")
-		_project_id = kwargs.get("_project_id", kwargs.get("project_id"))
-		json = api.get_config(_project_id, cls._name, _id)
-		json["_project_id"] = _project_id
-		return cls.create(**json)
+	def get(cls, project_id, id, json=False, *args, **kwargs):
+		record = api.get_config(project_id, cls._name, id)
+		record["_project_id"] = project_id
+		if json:
+			return record
+		else: 
+			return cls.create(**record)
+			
 
 	@classmethod
 	def create(cls, _project_id, _id, *args, **kwargs):
@@ -65,33 +70,38 @@ class Model(object):
 		used to create a model from a json dict with no pending 
 		change updates, ie _field_updates
 		"""
-		_id = kwargs.pop('_id')
-		_project_id = kwargs.pop('_project_id')
-		model = cls(*args, **kwargs, project_id=_project_id)
+		model = cls(*args, project_id=_project_id)
 		model._id = _id
+		for k, v in kwargs.items():
+			setattr(model, k, v)
 		model._field_updates.clear()
 		return model
 
 	@classmethod
-	def filter(cls, project_id, *args, **query):
-		project_id = query.pop('project_id')
+	def filter(cls, project_id, json=False, *args, **query):
 		results = api.query_config(project_id, cls._name, query)
 		if results is not None:
 			items = []
 			for result in results:
 				result['_project_id'] = project_id
-				item = cls.create(**result)
+				if not json:
+					item = cls.create(**result)
+				else:
+					item = result
 				items.append(item)
 			return items
 
 	@classmethod
-	def all(cls, project_id, *args, **kwargs):
+	def all(cls, project_id, json=False, *args, **kwargs):
 		results = api.get_configs(project_id, cls._name)
 		if results is not None:
 			items = []
 			for result in results:
 				result['_project_id'] = project_id
-				item = cls.create(**result)
+				if not json:
+					item = cls.create(**result)
+				else:
+					item = result
 				items.append(item)
 			return items
 
