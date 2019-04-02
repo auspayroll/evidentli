@@ -110,7 +110,8 @@ class Model(object):
 	def save(self):
 		assert self._project_id
 		if self._id:
-			payload = { "_id": self._id, **self._field_updates }
+			payload = { "_id": self._id}
+			payload.update(self._field_updates)
 		else:
 			payload = self._field_updates
 		valid = api.save_config(self._project_id, self.__class__._name, payload)

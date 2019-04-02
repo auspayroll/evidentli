@@ -1,9 +1,7 @@
 import requests
+from config import PIANO_API
 
-PROJECT_ID = 'test_michael2'
-PIANO_API = 'http://dev.api.evidentli.com'
 PROJECTS_URL = PIANO_API + '/projects'
-
 
 
 def save_config(project_id, config_name, payload):
@@ -15,6 +13,7 @@ def save_config(project_id, config_name, payload):
         else:
             return jsn
 
+
 def get_config(project_id, config_name, config_id):
     response = requests.get(PROJECTS_URL + '/%s/%s/%s' % (project_id, config_name, config_id))
     if response.status_code == requests.codes.ok:
@@ -23,6 +22,7 @@ def get_config(project_id, config_name, config_id):
             return jsn[0]
         else:
             return jsn
+
 
 def get_configs(project_id, config_name):
     response = requests.get(PROJECTS_URL + '/%s/%s' % (project_id, config_name))
@@ -47,4 +47,3 @@ def query_config(project_id, config_name, query):
     response = requests.get(request_string)
     if response.status_code == 200 and response.content:
         return response.json()
-
