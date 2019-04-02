@@ -3,21 +3,24 @@ import uuid
 import requests
 from .orm.model import Model
 from .orm.patient import Patient
+from random import randint
 
 class Rondo(Model):
     _name = "rondo"
-    _fields = { 'cohorts': list, 'matched_pairs': list, 'match_by_cohort': bool } 
+    _fields = { 'cohorts': list, 'matched_pairs': list, 'match_by_cohort': bool, 'name': str } 
 
     def allocate_random_cohort(self, patient):
         # allocat random cohort to patient, deterministically based on _id
         patient_id = patient._id
         assert patient_id
         no_cohorts = len(self.cohorts)
-        if self.cohorts:
-            cohort_no = int(hashlib.sha256(str(patient_id).encode("utf-8")).hexdigest(), 16) % no_cohorts
+        if self.cohorts and not patient.cohort:
+            #cohort_no = int(hashlib.sha256(str(patient_id).encode("utf-8")).hexdigest(), 16) % no_cohorts
+            cohort_no = randint(0, no_cohorts-1)
             allocated_cohort = self.cohorts[cohort_no]
             patient.cohort = allocated_cohort
             patient.save()
+            return allocated_cohort
 
 
     def allocate_random_cohorts(self):
