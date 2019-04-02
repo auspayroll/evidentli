@@ -101,6 +101,12 @@ In this example, a list of patients whose lastname is `Smithers` __and__ age is 
 
   For efficiency, only changes to model object attributes are sent to the PIANO API for updating. Changes are only send when an objects ``save()`` method is called. Pending changes are stored in the  ``_field_updates`` attribute and generally shouldn't be changed. 
 
+  To update many fields at a time for an object, use the ``update`` method, that takes keyword arguments for each field. 
+
+  ``> updates = { "firstname" = "Kim", middlename="Jong", lastname="Un"}``
+
+  ``> patient.update(**updates)``
+
 ---
 
 ## Creating model objects from a dictionary

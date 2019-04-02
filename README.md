@@ -16,7 +16,7 @@ Rondo makes use of a simple ORM package (similar to Python Django) to make the c
 
 Once this package is installed, from the python command line, import the Rondo model. 
 
-``> from rondo import Rondo``
+``> from rondo_model import Rondo``
 
 Usage examples can be found in the package [test.py](rondo/test/test.py) file
 
@@ -71,6 +71,39 @@ In this example, patients with the same age and gender from each of the cohorts 
 
 ``> patient.pair_id == matched_patients[0].pair_id == matched_patient[1].pair_id``
 
+---
+
+## Deployment/Usage
+
+### HTTP REST endpoints
+
+#### Flowfiles 
+The flowfile endpoint can be used by data pipelines such as as Niagra Files (NiFi). Patient data can be posted in jason format, and return json object will contain ammended ``cohort`` and/or ``pair_id`` fields. The patient data should contain an ``_id`` field indicating its unique key. 
+
+The url format is  ``/projects/<project_id>/rondo/<rondo_id>/`` 
+
+#### Creating / updating Rondo objects
+
+Rondo objects are created and updated on the same endpoint, ie a ``POST`` to
+``/projects/<project_id>/rondo``. If an ``_id`` is present in the posted data, the corresponding Rondo
+objects is updated, returning the updated object itself, otherwise a new record is created and returned. 
+
+#### Retrieving Rondo objects
+
+A ``GET`` request in the format ``/projects/<project_id>/rondo/<rondo_id>``, returns the Rondo object in json format.
+
+---
+
+## Web interface
+
+A javascript application can be found at the relative path 
+``/static/index.html``
+
+A list of all Rondo objects can be seen from the Rondo link.
+
+Individual Rondo objects can be viewed and updated from 
+
+``/static/index.html#/rondo/<project_id>/<rondo_id>`` or navigated from the above Rondo list. 
 
 
 
