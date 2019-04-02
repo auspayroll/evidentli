@@ -122,6 +122,8 @@ class Model(object):
 
 
 	def update(self, **kwargs):
+		assert 'id' not in kwargs
+		assert '_id' not in kwargs
 		assert self._id and self._project_id
 		for k, v in kwargs.items():
 			setattr(self, k, v)
