@@ -1,13 +1,14 @@
 from  rondo.orm import piano_api as api
+import sys
 
 
 class Model(object):
 	def __init__(self, project_id, *args, **kwargs):
 		assert 'id' not in kwargs
 		assert '_id' not in kwargs
-		setattr(self, '_project_id', project_id)
 		self._field_updates = {}
-
+		#import pdb
+		#pdb.set_trace()
 		#check for allowable fields are of the correct type
 		if hasattr(self.__class__, "_fields"):
 			_fields = self.__class__._fields
@@ -27,6 +28,7 @@ class Model(object):
 						raise TypeError("%s should be of type %s" % (k, _type))
 
 			setattr(self, k, v)
+		setattr(self, '_project_id', project_id)
 
 	def __getattr__(self, name):
 		return None
@@ -38,13 +40,13 @@ class Model(object):
 				updates = self._field_updates
 				updates[name] = value
 				#prevent recursive calls to __setattr__
-				super().__setattr__("_field_updates", updates)
+				#super().__setattr__("_field_updates", updates)
+				super(Model, self).__setattr__("_field_updates", updates)
 			elif value is None:
 				pass
-		super().__setattr__(name, value)
+		#super().__setattr__(name, value)
+		super(Model, self).__setattr__(name, value)
 
-	def __iter__(self):
-		return iter([1,2])
 
 	@property
 	def _json(self):
@@ -116,6 +118,13 @@ class Model(object):
 			self._id = valid
 			self._field_updates.clear()
 			return self._id
+
+
+	def update(self, **kwargs):
+		assert self._id and self._project_id
+		for k, v in kwargs.items():
+			setattr(self, k, v)
+		self.save()
 
 		
 
