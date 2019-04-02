@@ -17,13 +17,15 @@ def all(project_id):
 
 @app.route('/projects/<project_id>/rondo', methods=['POST'])
 def createRondo(project_id):
-    posted = request.get_json()
-    _id = posted.get("_id")
+    json = request.get_json()
+    json.pop('project_id', None)
+    json.pop('_project_id', None)
+    _id = json.get("_id")
     if _id:
         rondo = Rondo.get(project_id=project_id, id=_id)
-        rondo.update(**posted)
+        rondo.update(**json)
     else:
-        rondo = Rondo(project_id=project_id, **posted)
+        rondo = Rondo(project_id=project_id, **json)
         rondo.save()
     return jsn(rondo._json)
 
