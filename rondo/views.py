@@ -41,6 +41,8 @@ def flowfile(project_id, rondo_id):
     and returns modified json as the flow file.
     """
     json = request.get_json()
+    json.pop('project_id', None)
+    json.pop('_project_id', None)
     patient = Patient.create(_project_id=project_id, **json)
     rondo = Rondo.get(project_id=project_id, id=rondo_id)
     rondo.allocate_random_cohort(patient)

@@ -130,13 +130,14 @@ class TestRondo(unittest.TestCase):
         # should match on patient 2 and patient 3
         self.assertEqual(len(matched_patients), 2)
 
+
     def test_flowfile(self):
         cohorts = ['T', 'R', 'V', 'D']
         rondo = Rondo(project_id=self.project_id, cohorts=cohorts)
         rondo_id = rondo.save()
         patient1 = Patient(project_id=self.project_id, person_id=1, firstname="testflowfile")
         patient1.save()
-        flowfile_url = "%s/projects/%s/flowfile/%s" % (RONDO_HOST, self.project_id, rondo_id)
+        flowfile_url = "%s/projects/%s/rondo/%s/flowfile" % (RONDO_HOST, self.project_id, rondo_id)
         print(patient1._json)
         response = requests.post(flowfile_url, json=patient1._json)
         self.assertTrue(response.json()['cohort'] in cohorts)
