@@ -36,7 +36,7 @@ ADD . /home/docker/code/
 
 # install python requirements
 RUN pip install -r /home/docker/code/requirements.txt
-#ARG CACHEBUST=1
+ARG CACHEBUST=1
 #RUN pip install git+https://bitbucket.org/evidentli/pianoauth.git
 
 # setup all the configfiles
