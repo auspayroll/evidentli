@@ -5,35 +5,46 @@ from flask import request
 from functools import wraps
 
 
-
 def cors(f):
     @wraps(f)
     def adjust_headers(*args, **kwargs):
-        response = f(*args, **kwargs)
+
+        if request.method == 'OPTIONS':
+            response = jsn({'message': 'options'})
+        else:
+            response = f(*args, **kwargs)
         if app.config['CORS']:
             response.headers["Access-Control-Allow-Origin"] = '*'
             response.headers["Access-Control-Allow-Headers"] = "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, \
-                Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+                Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Allow-Origin"
 
             response.headers["Access-Control-Allow-Methods"] = 'GET,HEAD,OPTIONS,POST,PUT'
             response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers['X-Application-Context'] = 'application'
         return response
     return adjust_headers
 
 
-@app.route('/')
+
+@app.route('/test', methods=['GET', 'OPTIONS'])
+@cors
+def test():
+    return jsn({ 'message': 'Hello World!, welcome to Rondo test' })
+
+@app.route('/', methods=['GET', 'OPTIONS'])
+@cors
 def index():
-    return 'Hello World!, welcome to Rondo'
+    return jsn({ 'message': 'Hello World!, welcome to Rondo' })
 
 
-@app.route('/projects/<project_id>/rondo', methods=['GET'])
+@app.route('/projects/<project_id>/rondo', methods=['GET', 'OPTIONS'])
 @cors
 def all(project_id):
     rondo = Rondo.all(project_id=project_id, json=True)
     return jsn(rondo)
 
 
-@app.route('/projects/<project_id>/rondo', methods=['POST'])
+@app.route('/projects/<project_id>/rondo', methods=['POST', 'OPTIONS'])
 @cors
 def createRondo(project_id):
     json = request.get_json()
@@ -49,14 +60,16 @@ def createRondo(project_id):
     return jsn(rondo._json)
 
 
-@app.route('/projects/<project_id>/rondo/<config_id>', methods=['GET'])
+
+@app.route('/projects/<project_id>/rondo/<config_id>', methods=['GET', 'OPTIONS'])
 @cors
 def getRondo(project_id, config_id):
     rondo = Rondo.get(project_id=project_id, id=config_id, json=True)
     return jsn(rondo)
 
 
-@app.route('/projects/<project_id>/rondo/<rondo_id>/flowfile', methods=['POST'])
+
+@app.route('/projects/<project_id>/rondo/<rondo_id>/flowfile', methods=['POST', 'OPTIONS'])
 @cors
 def flowfile(project_id, rondo_id):
     """
@@ -75,3 +88,11 @@ def flowfile(project_id, rondo_id):
     if patient.cohort:
         json['cohort'] = patient.cohort
     return jsn(json)
+
+
+
+
+
+
+
+
