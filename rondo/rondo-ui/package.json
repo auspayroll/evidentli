@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "node build/build.js && cp -f dist/index.html ../static/index.html && cp -f dist/static/css/* ../static && cp -f dist/static/js/* ../static"
+    "build": "node build/build.js && cp -f dist/index.html ../static/index.html && cp -f dist/static/css/* ../static/css && cp -f dist/static/js/* ../static/js"
   },
   "dependencies": {
     "axios": "^0.18.0",
