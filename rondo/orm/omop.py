@@ -1,10 +1,12 @@
 import requests
 import json
 from functools import reduce
-from config import PIANO_API
+from config import Config
 
 
-def get_omop(table, select=None, where=None, order_by=None, 
+
+
+def get_omop(project_id, table, select=None, where=None, order_by=None, 
 	limit=None, offset=None, as_list=False, reidentify=False):
 
 	if type(select) is str:
@@ -40,10 +42,10 @@ def get_omop(table, select=None, where=None, order_by=None,
 		payload["format"] = "list"
 
 
-	headers = { 'AUTHKEY': 'eobo', 'Content-Type': 'application/json'}
+	headers = { 'AUTHKEY': Config.EOBO_KEY, 'Content-Type': 'application/json'}
 
-	response = requests.post(PIANO_API + '/projects/test_michael2/omop', 
-    	json=payload, headers=headers)
+	#response = requests.post(PIANO_API + '/projects/test_michael2/omop', 
+	response = requests.post(PIANO_API + '/' + project_id + '/omop', json=payload, headers=headers)
 	rows = response.json()['rows']
 	return rows
 
@@ -62,20 +64,20 @@ def _get_match_dict(fields):
 	return kw
 
 
-def match_patient(person_id, fields):
+def match_patient(project_id, person_id, fields):
 	fields = _get_match_dict(fields)
 	print(fields)
 	person_matches = []
 	for table, fields in fields.items():
 		try:
-			results = get_omop(table, select=fields, where="person_id=%s" % person_id)
+			results = get_omop(project_id, table, select=fields, where="person_id=%s" % person_id)
 		except:
 			pass
 		else:
 			if results:
 				where = results[0]
 				try:
-					found = get_omop(table, select="person_id", where=where, as_list=True)
+					found = get_omop(project_id, table, select="person_id", where=where, as_list=True)
 				except:
 					pass
 				else:

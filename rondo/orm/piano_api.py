@@ -1,11 +1,11 @@
 import requests
-from config import PIANO_API
+from config import Config
 
-PROJECTS_URL = PIANO_API + '/projects'
+PROJECTS_URL = Config.PIANO_API + '/projects'
 
 
 def save_config(project_id, config_name, payload):
-    response = requests.post(PIANO_API + '/projects/%s/%s' % (project_id, config_name), json=[payload])
+    response = requests.post(PROJECTS_URL + '/%s/%s' % (project_id, config_name), json=[payload])
     if response.status_code == requests.codes.ok:
         jsn = response.json()
         if type(jsn) is list:

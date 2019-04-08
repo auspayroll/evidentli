@@ -3,6 +3,7 @@ from random import randint
 
 from .orm.model import Model
 from .orm.patient import Patient
+from .orm import omop
 
 
 class Rondo(Model):
@@ -32,9 +33,10 @@ class Rondo(Model):
         """
         private method to find matching patients and update with pair_id
         """
-        matched_patients = Patient.filter(project_id=patient._project_id, **criteria)
+        #matched_patients = Patient.filter(project_id=patient._project_id, **criteria)
+        matched_patient_ids = omop.match_patient(patient._project_id, patient.person_id)
+        matched_patients = Patient.match_by_person_ids([match_patient_ids])
         if matched_patients:
-
             for matched_patient in matched_patients:
                 if matched_patient._id == patient._id:
                     continue
