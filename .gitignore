@@ -4,4 +4,5 @@ rondo.egg-info/
 **/node_modules/
 **/vue/
 .idea*
+local_config.py
 *.py[cod]
