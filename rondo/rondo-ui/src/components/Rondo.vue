@@ -85,8 +85,9 @@
             matchedPairs = matchedPairs.map(s => s.trim());
             var name = this.name
             var saveObject = { cohorts, matched_pairs: matchedPairs, name, _id: this.id }
-            console.log(saveObject)
             axios.post(this.configsURL, saveObject).then( response => {
+              this.$router.push('/projects/' + this.projectId + '/rondos')
+              this.flash('Rondo saved', 'success');
             }).catch(error => {
               this.error = error;
             });
