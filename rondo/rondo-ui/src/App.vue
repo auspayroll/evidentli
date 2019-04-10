@@ -1,19 +1,28 @@
 <template>
   <div id="app">
     <h1>RONDO</h1>
-    <Project project_id="test_michael2" />
-
+    <!--<Project project_id="test_michael2" />-->
+    <div id="main">
+      <Rondo :project_id="projectId" :id="id" />
+    </div>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
   import Project from './Project.vue'
+  import Rondo from './components/Rondo.vue'
   axios.defaults.baseURL = process.env.VUE_APP_REMOTE
 
 
   export default {
-    components: { Project }
+    data(){
+      return {
+        projectId: this.$route.params.projectId, 
+        id: this.$route.params.id
+      }
+    }, 
+    components: { Project, Rondo }
   }
     
   </script>

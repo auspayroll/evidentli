@@ -65,7 +65,6 @@
           </div>
           
         </transition-group>
-        {{ cohortList }}
 
     </div>
 
