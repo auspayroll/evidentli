@@ -53,7 +53,7 @@ class Model(object):
 		items = { "_id": self._id, "_project_id": self._project_id }
 		for k,v in self.__dict__.items():
 			if k[0] != '_':
-				items[k] = str(v)
+				items[k] = v
 		return items
 
 	@classmethod
@@ -96,6 +96,20 @@ class Model(object):
 	@classmethod
 	def all(cls, project_id, json=False, *args, **kwargs):
 		results = api.get_configs(project_id, cls._name)
+		if results is not None:
+			items = []
+			for result in results:
+				result['_project_id'] = project_id
+				if not json:
+					item = cls.create(**result)
+				else:
+					item = result
+				items.append(item)
+			return items
+
+	@classmethod
+	def all_in(cls, project_id, field, values=[], json=False, *args, **kwargs):
+		results = api.get_configs_in(project_id, cls._name, field, values)
 		if results is not None:
 			items = []
 			for result in results:

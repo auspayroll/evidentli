@@ -30,6 +30,13 @@ def get_configs(project_id, config_name):
         jsn = response.json()
         return jsn
 
+def get_configs_in(project_id, config_name, field, field_list):
+    field_list_vals = [ str(ids) for ids in field_list]
+    response = requests.get(PROJECTS_URL + '/%s/%s?query=%s=in%s' % (project_id, config_name, field, field_list_vals))
+    if response.status_code == requests.codes.ok:
+        jsn = response.json()
+        return jsn
+
 
 def query_config(project_id, config_name, query):
     querystring = ";".join([ "%s='%s'" % (k,v) for (k,v) in query.items()])
