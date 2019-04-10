@@ -65,7 +65,7 @@
           </div>
           
         </transition-group>
-
+        {{ cohortList }}
 
     </div>
 
@@ -114,12 +114,12 @@
             }
         },
         cohortList: function(){
+          console.log(this.cohorts)
           if(!this.cohorts){
             return []
           } else {
             try {
-              cohort_list = this.cohorts.split(',').map(cohort => { return cohort.trim()})
-              return cohort_list
+              return this.cohorts.split(',').map(cohort => { return cohort.trim()})
             } catch(err) {
               console.log(err)
               console.log(this.cohorts)
