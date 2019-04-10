@@ -1,8 +1,9 @@
 from rondo import app
-from rondo.rondo_model import Rondo, Patient
+from rondo.rondo_model import Rondo
 from flask import jsonify as jsn
 from flask import request
 from functools import wraps
+from rondo.orm import Patient, omop
 
 
 def cors(f):
@@ -60,13 +61,11 @@ def createRondo(project_id):
     return jsn(rondo._json)
 
 
-
 @app.route('/projects/<project_id>/rondo/<config_id>', methods=['GET', 'OPTIONS'])
 @cors
 def getRondo(project_id, config_id):
     rondo = Rondo.get(project_id=project_id, id=config_id, json=True)
     return jsn(rondo)
-
 
 
 @app.route('/projects/<project_id>/rondo/<rondo_id>/flowfile', methods=['POST', 'OPTIONS'])
@@ -89,10 +88,11 @@ def flowfile(project_id, rondo_id):
         json['cohort'] = patient.cohort
     return jsn(json)
 
-
-
-
-
-
-
-
+@app.route('/projects/<project_id>/schema', methods=['GET', 'OPTIONS'])
+@cors
+def getSchema(project_id):
+    response = omop.get_schema(project_id)
+    if 'tables' in response:
+        return jsn({ "tables": response['tables']})
+    else:
+        return jsn(response)
