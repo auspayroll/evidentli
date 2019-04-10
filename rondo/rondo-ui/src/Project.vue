@@ -2,7 +2,7 @@
 
     <div id="app">
     <div id="logo_frame"></div>
-    {{ id }}
+    Project: {{ id }}
     <div id="content">
       <div id="sidebar">
         <h3>{{ id }}</h3> 
@@ -175,6 +175,18 @@ a {
 
   .fade-leave-active {
     transition: opacity 0.2s;
+    opacity: 0;
+  }
+
+  .slide-fade-enter-active {
+  transition: all .3s ease;
+  }
+  .slide-fade-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  }
+  .slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active below version 2.1.8 */ {
+    transform: translateX(10px);
     opacity: 0;
   }
 

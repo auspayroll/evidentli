@@ -1,5 +1,8 @@
 <template>
-  <div><flash-message></flash-message>
+  <div>
+
+          <flash-message transitionName="slide-fade"></flash-message>
+
         <form>
 
         <router-link :to="{name: 'createRondo', projectId: projectId }" tag="button" class="btn btn-primary">Add RONDO Processor</router-link>

@@ -149,4 +149,20 @@ a {
     opacity: 0;
   }
 
+  .tag {
+    font-weight: bold;
+    border-radius: 5px;
+    padding:5px;
+  }
+
+  .field-info{
+    border: 1pt #cccccc solid;
+    margin-bottom: 5px;
+    padding: 8px;
+    background: #efefef;
+    overflow:hidden;
+  }
+
+
+
 </style>

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "shlex": "^2.0.1",
     "vue": "^2.5.2",
     "vue-flash-message": "^0.7.2",
     "vue-router": "^3.0.2"
