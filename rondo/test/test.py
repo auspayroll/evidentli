@@ -5,7 +5,8 @@ import os
 import requests
 from flask import Flask
 
-from rondo.rondo_model import Patient, Rondo
+from rondo.rondo_model import Rondo
+from rondo.orm import Patient
 
 RONDO_HOST = os.getenv("RONDO_HOST", "http://0.0.0.0:5012")
 
