@@ -4,8 +4,6 @@ from functools import reduce
 from config import Config
 
 
-
-
 def get_omop(project_id, table, select=None, where=None, order_by=None, 
 	limit=None, offset=None, as_list=False, reidentify=False):
 
@@ -45,30 +43,16 @@ def get_omop(project_id, table, select=None, where=None, order_by=None,
 	headers = { 'AUTHKEY': Config.EOBO_KEY, 'Content-Type': 'application/json'}
 
 	#response = requests.post(PIANO_API + '/projects/test_michael2/omop', 
-	response = requests.post(PIANO_API + '/' + project_id + '/omop', json=payload, headers=headers)
+	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop'
+	response = requests.post(request_url, json=payload, headers=headers)
 	rows = response.json()['rows']
 	return rows
 
 
-def _get_match_dict(fields):
-	kw = {}
-	keywords = [x.strip().strip(",") for x in fields.split(' ')]
-	for keyword in keywords:
-		try:
-			table, field = keyword.split('.')
-		except:
-			pass
-		else:
-			table_fields = kw.setdefault(table.lower(),[])
-			table_fields.append(field.lower())
-	return kw
-
-
-def match_patient(project_id, person_id, fields):
-	fields = _get_match_dict(fields)
-	print(fields)
+def match_patient(project_id, person_id, field_dict):
 	person_matches = []
-	for table, fields in fields.items():
+	match_list = []
+	for table, fields in field_dict.items():
 		try:
 			results = get_omop(project_id, table, select=fields, where="person_id=%s" % person_id)
 		except:
@@ -80,13 +64,17 @@ def match_patient(project_id, person_id, fields):
 					found = get_omop(project_id, table, select="person_id", where=where, as_list=True)
 				except:
 					pass
-				else:
+				else:		
 					matched_ids = reduce(lambda x,y: x+y,found)
+					matched_ids = [ str(mid) for mid in matched_ids]
 					person_matches.append(set(matched_ids))
-
-	match_list = list(set.intersection(*person_matches))
-	match_list.remove(person_id)
+					match_list = list(set.intersection(*person_matches))
+					match_list.remove(str(person_id))
 	return match_list
 
 
-
+def get_schema(project_id):
+	headers = { 'AUTHKEY': Config.EOBO_KEY, 'Content-Type': 'application/json'}
+	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop/schema' 
+	response = requests.get(request_url, headers=headers)
+	return response.json()
