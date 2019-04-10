@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <h1>RONDO</h1>
-    <!--<Project project_id="test_michael2" />-->
-    <div id="main">
+
+      <div id="main" v-if="id">
       <Rondo :project_id="projectId" :id="id" />
     </div>
+    <Project project_id="test_michael2" v-else />
+
   </div>
 </template>
 
