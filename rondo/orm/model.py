@@ -1,4 +1,4 @@
-from  rondo.orm import piano_api as api
+from . import piano_api as api
 import sys
 
 
