@@ -36,13 +36,13 @@ class Model(object):
 			#the field value has changed, add it to _field_updates
 			if hasattr(self, name) and getattr(self, name) != value or not hasattr(self,name):
 				updates = self._field_updates
-				updates[name] = str(value)
+				updates[name] = value
 				#prevent recursive calls to __setattr__
 				super(Model, self).__setattr__("_field_updates", updates)
 			elif value is None:
 				pass
 
-			super(Model, self).__setattr__(name, str(value))
+			super(Model, self).__setattr__(name, value)
 
 
 	@property
