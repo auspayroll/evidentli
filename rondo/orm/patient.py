@@ -17,9 +17,6 @@ class Patient(Model):
 		omop_tables = kwargs.pop('omop', None)
 		results = super(Patient, cls).filter(*args, project_id=project_id, **kwargs)
 		patient_ids = [ p.person_id for p in results ]
-		print(patient_ids)
-		#import pdb
-		#pdb.set_trace()
 		if type(omop_tables) is str:
 			omop_tables = omop_tables.split(',')
 		elif type(omop_tables) is not list:
