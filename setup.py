@@ -5,6 +5,6 @@ setup(
     packages=['rondo'],
     include_package_data=True,
     install_requires=[
-        'flask', 'requests', 'unittest'
+        'flask', 'requests', 'unittest', 'python-string-utils'
     ],
 )

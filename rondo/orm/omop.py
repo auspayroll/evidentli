@@ -2,27 +2,33 @@ import requests
 import json
 from functools import reduce
 from config import Config
+import string_utils
 
 
-def raw_sql(project_id, sql, as_list=False, reidentify=False):
+def raw_sql(project_id, sql, verb='POST', as_list=False, reidentify=False):
 	payload = { "query": sql, "reidentify": reidentify }
 	if as_list:
 		payload["format"] = "list"
 
 	headers = { 'AUTHKEY': Config.EOBO_KEY, 'Content-Type': 'application/json'}
 	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop'
-	response = requests.post(request_url, json=payload, headers=headers)
-	json_response = response.json()
-	if 'rows' in json_response:
-		return json_response['rows']
+	if verb == 'POST':
+		response = requests.post(request_url, json=payload, headers=headers)
 	else:
-		return json_response
+		response = requests.get(request_url, json=payload, headers=headers)
+	rows = response.json()
+	if 'rows' in rows:
+		return rows['rows']
+	else:
+		rows['payload'] = payload
+		rows['url'] = request_url
+		return rows
 
 
 
 def get_omop(project_id, table, select=None, where=None, order_by=None, 
 	limit=None, offset=None, as_list=False, reidentify=False, all_in=[]):
-
+	table = string_utils.camel_case_to_snake(table)
 	if type(select) is str:
 		query = "select %s from %s " % (select, table)
 	elif type(select) is list:
@@ -42,9 +48,9 @@ def get_omop(project_id, table, select=None, where=None, order_by=None,
 		else:
 			query = query + "where %s " % where
 
-	if where:
+	if where and all_in:
 		query = query + "and person_id in " + str(all_in).replace('[','(').replace(']',')')
-	else:
+	elif all_in:
 		query = query + "where person_id in " + str(all_in).replace('[','(').replace(']',')')
 
 	if order_by:
@@ -56,18 +62,22 @@ def get_omop(project_id, table, select=None, where=None, order_by=None,
 	if offset and type(offset) in (str, int):
 		query = query + " offset %s " % offset
 
-	payload = { "query": query, "reidentify": reidentify }
-	if as_list:
-		payload["format"] = "list"
+	return raw_sql(project_id, query, 'POST', as_list, reidentify)
 
-
+	"""
 	headers = { 'AUTHKEY': Config.EOBO_KEY, 'Content-Type': 'application/json'}
 
 	#response = requests.post(PIANO_API + '/projects/test_michael2/omop', 
 	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop'
 	response = requests.post(request_url, json=payload, headers=headers)
-	rows = response.json()['rows']
-	return rows
+	rows = response.json()
+	if 'rows' in rows:
+		return rows['rows']
+	else:
+		rows['payload'] = payload
+		rows['url'] = request_url
+		return rows
+	"""
 
 
 def match_patient(project_id, person_id, field_dict):
