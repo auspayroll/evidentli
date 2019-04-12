@@ -6,9 +6,7 @@ class Model(object):
 	def __init__(self, project_id, *args, **kwargs):
 		assert 'id' not in kwargs
 		assert '_id' not in kwargs
-		self._field_updates = {}
-		#import pdb
-		#pdb.set_trace()
+		super(Model, self).__setattr__("_field_updates", {})
 		#check for allowable fields are of the correct type
 		if hasattr(self.__class__, "_fields"):
 			_fields = self.__class__._fields
@@ -28,7 +26,7 @@ class Model(object):
 						raise TypeError("%s should be of type %s" % (k, _type))
 
 			setattr(self, k, v)
-		setattr(self, '_project_id', project_id)
+		super(Model, self).__setattr__("_project_id", project_id)
 
 	def __getattr__(self, name):
 		return None
@@ -38,14 +36,13 @@ class Model(object):
 			#the field value has changed, add it to _field_updates
 			if hasattr(self, name) and getattr(self, name) != value or not hasattr(self,name):
 				updates = self._field_updates
-				updates[name] = value
+				updates[name] = str(value)
 				#prevent recursive calls to __setattr__
-				#super().__setattr__("_field_updates", updates)
 				super(Model, self).__setattr__("_field_updates", updates)
 			elif value is None:
 				pass
-		#super().__setattr__(name, value)
-		super(Model, self).__setattr__(name, value)
+
+			super(Model, self).__setattr__(name, str(value))
 
 
 	@property
@@ -73,7 +70,7 @@ class Model(object):
 		change updates, ie _field_updates
 		"""
 		model = cls(*args, project_id=_project_id)
-		model._id = _id
+		super(Model, model).__setattr__("_id", _id)
 		for k, v in kwargs.items():
 			setattr(model, k, v)
 		model._field_updates.clear()
@@ -96,20 +93,6 @@ class Model(object):
 	@classmethod
 	def all(cls, project_id, json=False, *args, **kwargs):
 		results = api.get_configs(project_id, cls._name)
-		if results is not None:
-			items = []
-			for result in results:
-				result['_project_id'] = project_id
-				if not json:
-					item = cls.create(**result)
-				else:
-					item = result
-				items.append(item)
-			return items
-
-	@classmethod
-	def all_in(cls, project_id, field, values=[], json=False, *args, **kwargs):
-		results = api.get_configs_in(project_id, cls._name, field, values)
 		if results is not None:
 			items = []
 			for result in results:
