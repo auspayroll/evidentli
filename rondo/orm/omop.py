@@ -4,8 +4,24 @@ from functools import reduce
 from config import Config
 
 
+def raw_sql(project_id, sql, as_list=False, reidentify=False):
+	payload = { "query": sql, "reidentify": reidentify }
+	if as_list:
+		payload["format"] = "list"
+
+	headers = { 'AUTHKEY': Config.EOBO_KEY, 'Content-Type': 'application/json'}
+	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop'
+	response = requests.post(request_url, json=payload, headers=headers)
+	json_response = response.json()
+	if 'rows' in json_response:
+		return json_response['rows']
+	else:
+		return json_response
+
+
+
 def get_omop(project_id, table, select=None, where=None, order_by=None, 
-	limit=None, offset=None, as_list=False, reidentify=False):
+	limit=None, offset=None, as_list=False, reidentify=False, all_in=[]):
 
 	if type(select) is str:
 		query = "select %s from %s " % (select, table)
@@ -26,6 +42,11 @@ def get_omop(project_id, table, select=None, where=None, order_by=None,
 		else:
 			query = query + "where %s " % where
 
+	if where:
+		query = query + "and person_id in " + str(all_in).replace('[','(').replace(']',')')
+	else:
+		query = query + "where person_id in " + str(all_in).replace('[','(').replace(']',')')
+
 	if order_by:
 		query = query + " order by %s " % order_by
 
@@ -45,6 +66,7 @@ def get_omop(project_id, table, select=None, where=None, order_by=None,
 	#response = requests.post(PIANO_API + '/projects/test_michael2/omop', 
 	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop'
 	response = requests.post(request_url, json=payload, headers=headers)
+	print(payload)
 	rows = response.json()['rows']
 	return rows
 
