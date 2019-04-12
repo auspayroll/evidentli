@@ -23,7 +23,7 @@ class Patient(Model):
 			return results
 		for table in omop_tables:
 			try:
-				omop_patients = omop.get_omop(project_id=project_id, table='person', all_in=patient_ids)
+				omop_patients = omop.get_omop(project_id=project_id, table=table, all_in=patient_ids)
 			except:
 				pass
 			else:
@@ -33,8 +33,9 @@ class Patient(Model):
 
 				for patient in results:
 					table_field = "_%s" % table.title()
-					setattr(patient, table_field, {})
-					table_dict = getattr(patient, table_field)
-					setattr(patient, table_field, patient_dict[int(patient.person_id)])
-					return results					
+					super(Model, patient).__setattr__(table_field, {})
+					omop_patient_values = patient_dict.get(int(patient.person_id))
+					if omop_patient_values:	
+						super(Model, patient).__setattr__(table_field, omop_patient_values)
+		return results					
 					
