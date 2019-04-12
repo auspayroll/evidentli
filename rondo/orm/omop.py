@@ -66,7 +66,6 @@ def get_omop(project_id, table, select=None, where=None, order_by=None,
 	#response = requests.post(PIANO_API + '/projects/test_michael2/omop', 
 	request_url = Config.PIANO_API + '/projects/' + project_id + '/omop'
 	response = requests.post(request_url, json=payload, headers=headers)
-	print(payload)
 	rows = response.json()['rows']
 	return rows
 

@@ -39,7 +39,6 @@ def get_configs_in(project_id, config_name, field, field_list):
 
 
 def query_config(project_id, config_name, query):
-    #querystring = ";".join([ "%s='%s'" % (k,v) for (k,v) in query.items()])
     terms = {}
     for (k,v) in query.items():
         if type(v) is list:
@@ -49,7 +48,6 @@ def query_config(project_id, config_name, query):
 
     querystring = ";".join(terms.values())
     request_string = PROJECTS_URL + "/%s/%s?query=AND(%s)" % (project_id, config_name, querystring)
-    print(request_string)
     response = requests.get(request_string)
     if response.status_code == 200 and response.content:
         return response.json()
