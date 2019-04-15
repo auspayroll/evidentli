@@ -16,6 +16,8 @@ class Patient(Model):
 	def filter(cls, project_id, *args, **kwargs):
 		omop_tables = kwargs.pop('omop', None)
 		results = super(Patient, cls).filter(*args, project_id=project_id, **kwargs)
+		if not results:
+			return []
 		patient_ids = [ p.person_id for p in results ]
 		if type(omop_tables) is str:
 			omop_tables = [ t.strip() for t in omop_tables.split(',')]
@@ -32,7 +34,7 @@ class Patient(Model):
 					patient_dict[op['person_id']] = op
 
 				for patient in results:
-					table_field = "_%s" % table
+					table_field = "_%s" % table.title()
 					super(Model, patient).__setattr__(table_field, {})
 					omop_patient_values = patient_dict.get(int(patient.person_id))
 					if omop_patient_values:	
