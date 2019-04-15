@@ -9,7 +9,6 @@ from rondo.orm import Patient, omop
 def cors(f):
     @wraps(f)
     def adjust_headers(*args, **kwargs):
-
         if request.method == 'OPTIONS':
             response = jsn({'message': 'options'})
         else:
@@ -28,12 +27,10 @@ def cors(f):
 
 
 @app.route('/test', methods=['GET', 'OPTIONS'])
-@cors
 def test():
     return jsn({ 'message': 'Hello World!, welcome to Rondo test' })
 
 @app.route('/', methods=['GET', 'OPTIONS'])
-@cors
 def index():
     return jsn({ 'message': 'Hello World!, welcome to Rondo' })
 
@@ -80,7 +77,7 @@ def flowfile(project_id, rondo_id):
     json.pop('_project_id', None)
     patient = Patient.create(_project_id=project_id, **json)
     rondo = Rondo.get(project_id=project_id, id=rondo_id)
-    rondo.allocate_random_cohort(patient)
+    rondo.allocate_random_cohort(patient, force=True)
     rondo.match_patient(patient)
     if patient.pair_id:
         json["pair_id"] = patient.pair_id
