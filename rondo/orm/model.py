@@ -42,7 +42,7 @@ class Model(object):
 			elif value is None:
 				pass
 
-			super(Model, self).__setattr__(name, value)
+		super(Model, self).__setattr__(name, value)
 
 
 	@property
@@ -125,6 +125,3 @@ class Model(object):
 		for k, v in kwargs.items():
 			setattr(self, k, v)
 		self.save()
-
-		
-
