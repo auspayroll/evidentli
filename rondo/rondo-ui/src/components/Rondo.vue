@@ -23,10 +23,6 @@
             <ul>
               <li v-for="mp in matchedPairsList"><button class="btn-info tag">{{ mp }}</button></li>
             </ul>
-            
-            <div>
-            Match by Cohort: {{ matchByCohort ? 'yes' : 'no' }}
-            </div>
 
           </div>
 
@@ -50,14 +46,15 @@
             <p/>
             <h4>Matched Pairs</h4>
             <textarea style="height:90px;font-size:large" v-model="matchedPairs" rows="3" placeholder="enter field names, seperated by commas, eg. Person.provider_id, Person.year_of_birth"></textarea>
-            <input type="checkbox" v-model="matchByCohort"> Match by Cohort
+            <!--<input type="checkbox" v-model="matchByCohort"> Match by Cohort-->
             <button name="save" type="button" class="btn-success" @click="save">Save</button>
             <p/>
+            
             <h3>OMOP Fields</h3>
             <div v-if="!schema">Loading...</div>
             <div v-for="table, table_name in schema">
               <div v-for="column in table.columns" class="field-info">
-                <strong>{{ table_name }}.{{ column.name }}</strong>
+                <strong>{{ table_name | capitalize }}.{{ column.name }}</strong>
                 <div>{{ column.description }} <i>Type: {{ column.type }}</i></div>
                 <button v-show="showAddList(table_name + '.' + column.name)" class="btn-info float-right" @click="addMatchedPair(table_name + '.' + column.name)">Add</button>
               </div>
@@ -113,7 +110,6 @@
             }
         },
         cohortList: function(){
-          console.log(this.cohorts)
           if(!this.cohorts){
             return []
           } else {
@@ -142,7 +138,8 @@
             });
       },
       showAddList(column){
-        if(this.matchedPairsList.includes(column)){
+        var mpl = this.matchedPairsList.map(x => { return x.toLowerCase()})
+        if(mpl.includes(column.toLowerCase())){
           return false
         }
         return true
@@ -151,7 +148,7 @@
         if(this.matchedPairsList.includes(column)){
           return false
         } else {
-          if(this.matchedPairs){
+          if(this.matchedPairs !== '' ){
             this.matchedPairs += ', '
           }
           this.matchedPairs += column
@@ -161,8 +158,8 @@
         axios.get(this.configsURL + '/' + this.id).then( 
             response => { 
                 this.id = response.data._id
-                this.cohorts = response.data.cohorts 
-                this.matchedPairs = response.data.matched_pairs
+                this.cohorts = response.data.cohorts.toString()
+                this.matchedPairs = response.data.matched_pairs.toString()
                 this.matchByCohort = response.data.match_by_cohort
                 this.name = response.data.name || ''
             }
