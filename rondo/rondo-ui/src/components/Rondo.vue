@@ -1,6 +1,7 @@
 <template>
   <div>
-
+        <h1>Rondo</h1><p>
+        Project {{ projectId }}
         <flash-message transitionName="slide-fade"></flash-message>
         <div class="nav">
           <button :class="activePanel == 'summary' ? 'btn-primary': 'btn-secondary'" @click="activePanel='summary'">Summary</button>
@@ -145,6 +146,7 @@
         return true
       },
       addMatchedPair(column){
+        column = column.charAt(0).toUpperCase() + column.slice(1)
         if(this.matchedPairsList.includes(column)){
           return false
         } else {
@@ -152,14 +154,20 @@
             this.matchedPairs += ', '
           }
           this.matchedPairs += column
+          return true
         }
       },
       load(){
+        console.log(this.configsURL + '/' + this.id)
         axios.get(this.configsURL + '/' + this.id).then( 
             response => { 
                 this.id = response.data._id
-                this.cohorts = response.data.cohorts.toString()
-                this.matchedPairs = response.data.matched_pairs.toString()
+                if(response.data.cohorts){
+                  this.cohorts = response.data.cohorts.toString()
+                }
+                if(response.data.matched_pairs){
+                  this.matchedPairs = response.data.matched_pairs.toString()
+                }
                 this.matchByCohort = response.data.match_by_cohort
                 this.name = response.data.name || ''
             }

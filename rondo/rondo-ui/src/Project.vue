@@ -31,10 +31,10 @@
   import axios from 'axios';
   axios.defaults.baseURL = process.env.VUE_APP_REMOTE
   export default {
-    props: ['project_id'], 
+    props: ['projectId'], 
     data(){
       //console.log(JSON.stringify(this.$route.params))
-      var _id = this.$route.params.projectId || this.project_id || 'test_michael2'
+      var _id = this.$route.params.projectId || this.projectId || 'test_michael2'
       return {
         id: _id
       }

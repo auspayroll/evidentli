@@ -1,11 +1,10 @@
 <template>
   <div id="app">
-    <h1>RONDO</h1>
 
       <div id="main" v-if="id">
-      <Rondo :project_id="projectId" :id="id" />
+      <Rondo :projectId="projectId" :id="id" />
     </div>
-    <Project project_id="test_michael2" v-else />
+    <Project projectId="test_michael2" v-else />
 
   </div>
 </template>
@@ -19,6 +18,7 @@
 
   export default {
     data(){
+      console.log("-->" + this.$route.params.projectId)
       return {
         projectId: this.$route.params.projectId, 
         id: this.$route.params.id
