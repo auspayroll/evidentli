@@ -1,9 +1,9 @@
 from rondo import app
-from rondo.rondo_model import Rondo
+from .rondo_model import Rondo
 from flask import jsonify as jsn
 from flask import request
 from functools import wraps
-from rondo.orm import Patient, omop
+from orm import Patient, omop
 
 
 def cors(f):

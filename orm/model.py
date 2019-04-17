@@ -78,7 +78,7 @@ class Model(object):
 
 	@classmethod
 	def filter(cls, project_id, json=False, *args, **query):
-		results = api.query_config(project_id, cls._name, query)
+		results = api.query_config(project_id, cls._name, **query)
 		if results is not None:
 			items = []
 			for result in results:
