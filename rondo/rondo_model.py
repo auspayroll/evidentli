@@ -1,9 +1,9 @@
 import uuid
 from random import randint
 
-from .orm.model import Model
-from .orm.patient import Patient
-from .orm import omop
+from orm.model import Model
+from orm.patient import Patient
+from orm import omop
 
 
 class Rondo(Model):
@@ -172,12 +172,14 @@ class Rondo(Model):
 
         patient.pair_id = uuid.uuid4().hex
 
+        # go through each cohort..
         for cohort, patient_cohort in self.patient_cohorts.items():
-            if cohort == patient.cohort:
-                continue
+            if cohort == patient.cohort or not cohort:
+                continue #if the same cohort
+            # .. and find a patient match
             for patient_pair in patient_cohort:
                 if patient_pair.pair_id:
-                    continue
+                   continue
                 broken_match = False
                 for k,v in match_pattern.items():
                     try:
@@ -194,7 +196,7 @@ class Rondo(Model):
                     patient_pairs.append(patient_pair)
                     if patient._field_updates:
                         patient.save()
-                    break # match found for cohort
+                    break # match found for cohort, go the next one
 
         if 'pair_id' in patient._field_updates:
             patient.pair_id = None
@@ -203,10 +205,6 @@ class Rondo(Model):
 
     @property
     def matched_patients(self):
-        self._load_patients()
-        for patient in self._patients:
-            patient.pair_id = None
-            patient._field_updates.clear()
         if not self._patients:
             return None
         mpd = {}
@@ -217,12 +215,11 @@ class Rondo(Model):
         return mpd
 
     def match_patients(self):
-        #import pdb
-        #pdb.set_trace()
+        self._load_patients()
         matched_pairs_dict = self._matched_pairs_dict
         self._load_patients()
         for patient in self._patients:
-            self.match_patient(patient)
+            matched_patients = self.match_patient(patient)
         return self._patients
 
 
