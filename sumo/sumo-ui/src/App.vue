@@ -1,11 +1,10 @@
 <template>
   <div id="app">
-    <h1>RONDO</h1>
 
       <div id="main" v-if="id">
-      <Rondo :project_id="projectId" :id="id" />
+      <Sumo :projectId="projectId" :id="id" />
     </div>
-    <Project project_id="test_michael2" v-else />
+    <Project projectId="test_michael2" v-else />
 
   </div>
 </template>
@@ -13,18 +12,19 @@
 <script>
   import axios from 'axios'
   import Project from './Project.vue'
-  import Rondo from './components/Rondo.vue'
+  import Sumo from './components/Sumo.vue'
   axios.defaults.baseURL = process.env.VUE_APP_REMOTE
 
 
   export default {
     data(){
+      console.log("-->" + this.$route.params.projectId)
       return {
         projectId: this.$route.params.projectId, 
         id: this.$route.params.id
       }
     }, 
-    components: { Project, Rondo }
+    components: { Project, Sumo }
   }
     
   </script>

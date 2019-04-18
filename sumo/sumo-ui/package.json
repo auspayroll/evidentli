@@ -1,5 +1,5 @@
 {
-  "name": "todo-app",
+  "name": "Sumo",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "Simon Grant <auspayroll@gmail.com>",
@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "node build/build.js && cp -f dist/index.html ../static/index.html && cp -f dist/static/css/* ../static/css && cp -f dist/static/js/* ../static/js"
+    "build": "node build/build.js && cp -f dist/index.html ../static/sumo/index.html && cp -f dist/static/css/* ../static/sumo/css && cp -f dist/static/js/* ../static/sumo/js"
   },
   "dependencies": {
     "axios": "^0.18.0",

@@ -1,28 +1,28 @@
 <template>
   <div>
-
-          <flash-message transitionName="slide-fade"></flash-message>
+        
+        <flash-message transitionName="slide-fade"></flash-message>
 
         <form>
 
-        <router-link :to="{name: 'createRondo', projectId: projectId }" tag="button" class="btn btn-primary">Add RONDO Processor</router-link>
+        <router-link :to="{name: 'createSumo', projectId: projectId }" tag="button" class="btn btn-primary">Add SUMO Processor</router-link>
         <div v-show="error" class="alert-danger">{{ error }}</div>
 
         <p/>
         <table class="table table-striped table-hover">
             <tr><th>Id</th><th>Name</th><th>No. Cohorts</th><th>Matched Pairs</th></tr>
-            <tr v-for="rondo in rondos">
+            <tr v-for="sumo in sumos">
                 <td>
-                    <router-link :to="{ name: 'rondo', params: { id: rondo._id }}">{{ rondo.name || rondo._id}}</router-link>
+                    <router-link :to="{ name: 'sumo', params: { id: sumo._id }}">{{ sumo.name || sumo._id}}</router-link>
                 </td>        
                 <td>
-                    {{ rondo.name }}
+                    {{ sumo.name }}
                 </td>
                 <td>
-                    {{ rondo.cohorts?rondo.cohorts.length:'-' }}
+                    {{ sumo.cohorts ? csvLength(sumo.cohorts) : '-' }}
                 </td>
                   <td>
-                    {{ rondo.matched_pairs?rondo.matched_pairs.length:'-' }}
+                    {{ sumo.matched_pairs ? csvLength(sumo.matched_pairs) : '-' }}
                 </td>
             </tr>
         </table>
@@ -40,7 +40,7 @@
     props: ["projectId"],    
     data: function(){
       return {
-        rondos: [],
+        sumos: [],
         name: '',
         error: ''
       }
@@ -49,26 +49,31 @@
         axios.interceptors.request.use(request => {
             return request
         });
-        axios.get(this.rondosURL).then( 
+        console.log(this.sumosURL)
+        axios.get(this.sumosURL).then( 
             response => { 
-                this.rondos = response.data
+                console.log(response.data)
+                this.sumos = response.data
             }
         ).catch(error => {
             this.error = error;
         })
     },
     computed: {
-        rondosURL: function(){
-            return '/projects/' + this.projectId + '/rondo'
+        sumosURL: function(){
+            return '/projects/' + this.projectId + '/sumo'
         }
     },
     methods: {
       add(e){
-          var new_rondo = { name: this.name, cohorts: [], matched_pairs: []};
-          axios.post(this.configsURL, new_rondo).then( response => {
-                new_rondo["_id"] = response.data[0];
-                this.configs.push(new_rondo);
+          var new_sumo = { name: this.name, cohorts: [], matched_pairs: []};
+          axios.post(this.configsURL, new_sumo).then( response => {
+                new_sumo["_id"] = response.data[0];
+                this.configs.push(new_sumo);
           })
+      }, 
+      csvLength(csv){
+        return csv.split(",").length
       }
     }
   }
