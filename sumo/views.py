@@ -8,7 +8,6 @@ from orm import Patient, omop
 def cors(f):
     @wraps(f)
     def adjust_headers(*args, **kwargs):
-
         if request.method == 'OPTIONS':
             response = jsn({'message': 'options'})
         else:
@@ -29,7 +28,7 @@ def cors(f):
 @app.route('/', methods=['GET', 'OPTIONS'])
 @cors
 def index():
-    return jsn({ 'message': 'Hello World!, welcome to Sumo' })
+    return jsn({ 'message': 'Hello World!, welcome to Sumo!!' })
 
 
 @app.route('/projects/<project_id>/sumo', methods=['GET', 'OPTIONS'])
@@ -57,23 +56,40 @@ def createSumo(project_id):
 
 @app.route('/projects/<project_id>/sumo/<config_id>', methods=['GET', 'OPTIONS'])
 @cors
-def getRondo(project_id, config_id):
+def getSumo(project_id, config_id):
     sumo = Sumo.get(project_id=project_id, id=config_id, json=True)
     return jsn(sumo)
 
 
-@app.route('/projects/<project_id>/sumo/<sumo_id>/refresh', methods=['POST', 'OPTIONS'])
+@app.route('/projects/<project_id>/sumo/<sumo_id>/stats', methods=['GET', 'OPTIONS'])
 @cors
-def refresh(project_id, sumo_id):
+def stats(project_id, sumo_id):
     """
     endpoint used for nifi processor. It accepts patient json,
     and returns modified json as the flow file.
     """
-    json = request.get_json()
-    json.pop('project_id', None)
-    json.pop('_project_id', None)
-    patient = Patient.create(_project_id=project_id, **json)
+    sumo = Sumo.get(project_id=project_id, id=sumo_id)
+    sumo.analyse()
+    return jsn(sumo.stats_by_field)
+
+
+@app.route('/projects/<project_id>/sumo/<sumo_id>/raw_stats', methods=['GET', 'OPTIONS'])
+@cors
+def raw_stats(project_id, sumo_id):
+    """
+    endpoint used for nifi processor. It accepts patient json,
+    and returns modified json as the flow file.
+    """
     sumo = Sumo.get(project_id=project_id, id=sumo_id)
     sumo.analyse()
     return jsn(sumo.stats)
+
+@app.route('/projects/<project_id>/schema', methods=['GET', 'OPTIONS'])
+@cors
+def getSchema(project_id):
+    response = omop.get_schema(project_id)
+    if 'tables' in response:
+        return jsn({ "tables": response['tables']})
+    else:
+        return jsn(response)
 
