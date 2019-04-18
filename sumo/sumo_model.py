@@ -8,19 +8,40 @@ import numpy as np
 
 
 class Sumo(Model):
-    _name = "rondo"
+    _name = "sumo"
 
     def analyse(self):
-        self.stats = { "cohorts" : { key: { k: { "mean": None, "std": None, "irq": None } 
+        self.stats = { "cohorts" : { key: { k: { "mean": None, "std": None, "median": None, "iqr": None } 
                         for k in self._field_list } for key in self._cohort_list }}
+
         self._patient_values = { key: { k: [] for k in self._field_list } for key in self._cohort_list }
         self._load_patients()
         self._calc_stats()
-        if self.cohort_pairs and len(self.cohort_pairs) == 2:
-            self.stats["comparison"] = self.compare_cohort_matched_pairs(*self.cohort_pairs)
-            self.stats["matched_pairs"] = self.compare_cohort_matched_pairs(*self.cohort_pairs)
+        cohort_list = self._cohort_list
+        if cohort_list and len(cohort_list) > 1:
+            self.stats["comparison"] = self.compare_cohorts(cohort_list[0], cohort_list[1])
+            self.stats["matched_pairs"] = self.compare_cohort_matched_pairs(cohort_list[0], cohort_list[1])
 
         return self.stats
+
+    @property
+    def stats_by_field(self):
+        if not self.stats:
+            return []
+
+        field_dict = { k: { "cohorts": {}, "matched_pairs": {}, "comparison": {} } for k in self._field_list }   
+
+        for cohort, cohort_fields in self.stats["cohorts"].items():
+            for field_name, field_stats in cohort_fields.items():
+                field_dict[field_name]['cohorts'][cohort] = field_stats
+
+        for field_name, field_stats in self.stats["matched_pairs"].items():
+            field_dict[field_name]['matched_pairs'] = field_stats   
+
+        for field_name, field_stats in self.stats["comparison"].items():
+            field_dict[field_name]['comparison'] = field_stats     
+
+        return field_dict
 
 
     def compare_cohorts(self, cohort1, cohort2):
@@ -29,11 +50,11 @@ class Sumo(Model):
 
         summary = { k: {} for k in self._field_list }
         for item in self._field_list:
-            table, field = item.split('.')
             summary[item]['mean'] = self.stats['cohorts'][cohort1][item]['mean'] - self.stats['cohorts'][cohort2][item]['mean']
-            summary[item]['or'] = self.stats['cohorts'][cohort1][item]['mean'] - self.stats['cohorts'][cohort2][item]['mean']
+            summary[item]['or'] = self.stats['cohorts'][cohort1][item]['or'] - self.stats['cohorts'][cohort2][item]['or']
             summary[item]['median'] = self.stats['cohorts'][cohort1][item]['median'] - self.stats['cohorts'][cohort2][item]['median']
             summary[item]['std'] = self.stats['cohorts'][cohort1][item]['std'] - self.stats['cohorts'][cohort2][item]['std']
+            summary[item]['iqr'] = self.stats['cohorts'][cohort1][item]['iqr'] - self.stats['cohorts'][cohort2][item]['iqr']
         return summary
 
 
@@ -61,6 +82,8 @@ class Sumo(Model):
             stats[field]['mean'] = np.mean(diffs)
             stats[field]['median'] = np.median(diffs)
             stats[field]['std'] = np.std(diffs)
+            stats[field]['or'] = 1
+            stats[field]['iqr'] = np.subtract(*np.percentile(diffs, [75, 25]))
 
         return stats
 
@@ -88,7 +111,7 @@ class Sumo(Model):
                         self.stats['cohorts'][patient.cohort]["%s.%s" % (table, field)]['std'] = np.std(values)
                         self.stats['cohorts'][patient.cohort]["%s.%s" % (table, field)]['iqr'] = np.subtract(*np.percentile(values, [75, 25]))
                         self.stats['cohorts'][patient.cohort]["%s.%s" % (table, field)]['median'] = np.median(values)
-
+                        self.stats['cohorts'][patient.cohort]["%s.%s" % (table, field)]['or'] = 1
 
     @property
     def _cohort_list(self):
