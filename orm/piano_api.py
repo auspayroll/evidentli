@@ -33,7 +33,8 @@ def get_config(project_id, config_name, config_id):
 
 
 def get_configs(project_id, config_name):
-    response = requests.get(PROJECTS_URL + '/%s/%s' % (project_id, config_name))
+    url = PROJECTS_URL + '/%s/%s' % (project_id, config_name)
+    response = requests.get(url)
     if response.status_code in success_codes:
         jsn = response.json()
         return jsn
