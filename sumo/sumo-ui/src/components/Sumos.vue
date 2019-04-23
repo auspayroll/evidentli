@@ -10,19 +10,20 @@
 
         <p/>
         <table class="table table-striped table-hover">
-            <tr><th>Id</th><th>Name</th><th>No. Cohorts</th><th>Matched Pairs</th></tr>
+            <tr>
+            <th>Label</th>
+            <th>Field of analysis</th>
+            <th>No. Cohorts</th>
+            </tr>
             <tr v-for="sumo in sumos">
                 <td>
                     <router-link :to="{ name: 'sumo', params: { id: sumo._id }}">{{ sumo.name || sumo._id}}</router-link>
                 </td>        
                 <td>
-                    {{ sumo.name }}
+                    {{ sumo.foa }}
                 </td>
                 <td>
-                    {{ sumo.cohorts ? csvLength(sumo.cohorts) : '-' }}
-                </td>
-                  <td>
-                    {{ sumo.matched_pairs ? csvLength(sumo.matched_pairs) : '-' }}
+                    {{ sumo.cohorts }}
                 </td>
             </tr>
         </table>

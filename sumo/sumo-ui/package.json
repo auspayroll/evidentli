@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "chart.js": "^2.8.0",
+    "numeral": "^2.0.6",
     "shlex": "^2.0.1",
     "vue": "^2.5.2",
     "vue-flash-message": "^0.7.2",

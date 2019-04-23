@@ -86,7 +86,7 @@ class TestRondo(unittest.TestCase):
         matched_patients = rondo.match_patient(patient)
         assert len(matched_patients) == 0
 
-    def test_misMatch2(self):
+    def test_misMatch3(self):
         rondo = Rondo(project_id=self.project_id, cohorts='A,B', 
             matched_pairs='Person.test_field1, Measurement.non_existent_field')
         rondo._patients = list(self._patients.values())
