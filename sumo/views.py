@@ -69,20 +69,19 @@ def stats(project_id, sumo_id):
     and returns modified json as the flow file.
     """
     sumo = Sumo.get(project_id=project_id, id=sumo_id)
-    sumo.analyse()
     return jsn(sumo.stats_by_field)
 
 
-@app.route('/projects/<project_id>/sumo/<sumo_id>/raw_stats', methods=['GET', 'OPTIONS'])
+@app.route('/projects/<project_id>/sumo/<sumo_id>/calc_stats', methods=['GET', 'OPTIONS'])
 @cors
-def raw_stats(project_id, sumo_id):
+def calc_stats(project_id, sumo_id):
     """
     endpoint used for nifi processor. It accepts patient json,
     and returns modified json as the flow file.
     """
     sumo = Sumo.get(project_id=project_id, id=sumo_id)
     sumo.analyse()
-    return jsn(sumo.stats)
+    return jsn(sumo.stats_by_field)
 
 @app.route('/projects/<project_id>/schema', methods=['GET', 'OPTIONS'])
 @cors
