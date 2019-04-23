@@ -6,10 +6,12 @@ PROJECTS_URL = Config.PIANO_API + '/projects'
 success_codes = [requests.codes.ok]
 
 def raiseConnectionError(response):
+    print(response.__dict__)
     raise Exception("connection error")
 
 def save_config(project_id, config_name, payload):
-    response = requests.post(PROJECTS_URL + '/%s/%s' % (project_id, config_name), json=[payload])
+    request_url = PROJECTS_URL + '/%s/%s' % (project_id, config_name)
+    response = requests.post(request_url, json=[payload])
     if response.status_code in success_codes:
         jsn = response.json()
         if type(jsn) is list:
