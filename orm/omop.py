@@ -75,45 +75,6 @@ def get_omop(*args, **kwargs):
 	return obj.execute()
 
 
-def get_omop_old(project_id, table, select=None, where=None, order_by=None, 
-	limit=None, offset=None, as_list=False, reidentify=False, all_in=[]):
-	table = string_utils.camel_case_to_snake(table)
-	if type(select) is str:
-		query = "select %s from %s " % (select, table)
-	elif type(select) is list:
-		query = "select %s from %s " % (', '.join(select), table)
-	else:
-		query = "select * from %s " % table
-
-	if where: 
-		if type(where) is dict:
-			where_clauses = []
-			for k, v in where.items():
-				if type(v) is str:
-					where_clauses.append("%s = '%s'" % (k, v))
-				else:
-					where_clauses.append("%s = %s" % (k, v))
-			query = query + "where " + " and ".join(where_clauses)
-		else:
-			query = query + "where %s " % where
-
-	if where and all_in:
-		query = query + "and person_id in " + str(all_in).replace('[','(').replace(']',')')
-	elif all_in:
-		query = query + "where person_id in " + str(all_in).replace('[','(').replace(']',')')
-
-	if order_by:
-		query = query + " order by %s " % order_by
-
-	if limit and type(limit) in (str, int):
-		query = query + " limit %s " % limit
-
-	if offset and type(offset) in (str, int):
-		query = query + " offset %s " % offset
-
-	return raw_sql(project_id, query, 'POST', as_list, reidentify)
-
-
 def match_patient(project_id, person_id, field_dict):
 	person_matches = []
 	match_list = []

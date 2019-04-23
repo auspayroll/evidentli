@@ -125,3 +125,5 @@ class Model(object):
 		for k, v in kwargs.items():
 			setattr(self, k, v)
 		self.save()
+
+
