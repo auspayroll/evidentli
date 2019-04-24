@@ -100,10 +100,10 @@ class TestSumo(unittest.TestCase):
         sumo = self.sumo
         sumo.categories = '11,7'
         sumo.analyse()
-        #categories {'< 7_0': 2, '> 11_0': 1, '<11_0': 1}
-        assert(sumo.stats['categorized']['< 7_0'] == 2)
-        assert(sumo.stats['categorized']['> 11_0'] == 1)
-        assert(sumo.stats['categorized']['< 11_0'] == 1)
+        category_list = self.sumo.stats['categorized'][self.foa]
+        assert [v for (k,v) in category_list if k == '< 7.0'][0] == 2
+        assert [v for (k,v) in category_list if k == '> 11.0'][0] == 1
+        assert [v for (k,v) in category_list if k == '<= 11.0'][0] == 1
 
 
     def test_odds_cateogries_nominal(self):
@@ -117,8 +117,9 @@ class TestSumo(unittest.TestCase):
         self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k, **v,
             _Person={ self.foa.split('__')[1]: v['test_val']}) for k,v in patients.items()]
         self.sumo.analyse()
-        assert self.sumo.stats['categorized']['A'] == 3 
-        assert self.sumo.stats['categorized']['B'] == 1  
+        category_list = self.sumo.stats['categorized'][self.foa]
+        assert [v for (k,v) in category_list if k == 'A'][0] == 3
+        assert [v for (k,v) in category_list if k == 'B'][0] == 1
 
     def test_odds_ratio_nominal(self):
         patients = {
