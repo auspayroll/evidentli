@@ -51,6 +51,7 @@ def createSumo(project_id):
     else:
         sumo = Sumo(project_id=project_id, **json)
         sumo.save()
+    sumo.analyse()
     return jsn(sumo._json)
 
 
