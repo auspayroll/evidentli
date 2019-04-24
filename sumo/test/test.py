@@ -17,8 +17,7 @@ class TestSumo(unittest.TestCase):
         }
 
         self.sumo = sumo = Sumo(project_id=self.project_id, cohorts='A,B', foa=self.foa)
-        sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k, **v,
-            _Person={ self.foa.split('__')[1]: v['test_val']}) for k,v in self.patients.items()]
+        sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k, _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in self.patients.items()]
         
 
     def tearDown(self):
@@ -114,8 +113,8 @@ class TestSumo(unittest.TestCase):
             "4": { "cohort": 'B', "pair_id": '3454354XXXX', 'test_val': 'C' },
             "5": { "cohort": 'A', "pair_id": '', 'test_val': 'A' },
         }
-        self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k, **v,
-            _Person={ self.foa.split('__')[1]: v['test_val']}) for k,v in patients.items()]
+        self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k,
+            _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in patients.items()]
         self.sumo.analyse()
         category_list = self.sumo.stats['categorized'][self.foa]
         assert [v for (k,v) in category_list if k == 'A'][0] == 3
@@ -129,8 +128,8 @@ class TestSumo(unittest.TestCase):
             "4": { "cohort": 'B', "pair_id": '3454354XXXX', 'test_val': 'C' },
             "5": { "cohort": 'A', "pair_id": '', 'test_val': 'A' },
         }
-        self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k, **v,
-            _Person={ self.foa.split('__')[1]: v['test_val']}) for k,v in patients.items()]
+        self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k,
+            _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in patients.items()]
         self.sumo.exposure_level = 'A'
         self.sumo.analyse()
         assert self.sumo.stats['comparison'][self.foa]['OR'] == (2/3) / (1/2)
@@ -144,8 +143,8 @@ class TestSumo(unittest.TestCase):
             "4": { "cohort": 'B', "pair_id": '3454354XXXX', 'test_val': 1.2 },
             "5": { "cohort": 'A', "pair_id": '', 'test_val': 5 },
         }
-        self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k, **v,
-            _Person={ self.foa.split('__')[1]: v['test_val']}) for k,v in patients.items()]
+        self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k,
+            _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in patients.items()]
         self.sumo.exposure_level = 3
         self.sumo.analyse()
         assert self.sumo.stats['comparison'][self.foa]['OR'] == (2/3) / (1/2)
