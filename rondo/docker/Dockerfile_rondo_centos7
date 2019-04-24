@@ -32,10 +32,16 @@ WORKDIR /home/docker/code
 VOLUME /home/docker/code/app
 
 # install initial setup configs
-ADD . /home/docker/code/
+#ADD . /home/docker/code/
+ADD /rondo/docker /home/docker/code/docker
+ADD /rondo /home/docker/code/rondo
+ADD /orm /home/docker/code/orm
+ADD config.py /home/docker/code/
+ADD run_rondo.py /home/docker/code/
+
 
 # install python requirements
-RUN pip install -r /home/docker/code/requirements.txt
+RUN pip install -r /home/docker/code/rondo/requirements.txt
 ARG CACHEBUST=1
 #RUN pip install git+https://bitbucket.org/evidentli/pianoauth.git
 
