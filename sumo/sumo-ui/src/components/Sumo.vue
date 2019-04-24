@@ -116,7 +116,7 @@
           
         </transition-group>
         
-        <canvas id="myChart" width="100%" height="30vh"></canvas>
+        <canvas id="myChart" v-show="activePanel=='summary'" width="100%" height="30vh"></canvas>
 
 
 
