@@ -66,6 +66,7 @@
               Precision/rounding <br/><input type="number" placeholder="decimal places" v-model="precision" @change="roundPrecision">
             </p>        
             </div>
+
                
           </div>
 
@@ -89,7 +90,7 @@
           <div key="pairs" class="panel" v-show="activePanel=='pairs'">
             <p/>
             <h4>Field of analysis</h4>
-            <input style="font-size:large; width:90%" v-model="foa" placeholder="eg. Person.provider_id, Person.year_of_birth"></input>
+            <input style="font-size:large; width:90%" v-model="foa" placeholder="eg. Person.year_of_birth"></input>
             <p/>
             Precision/rounding <br/><input type="number" placeholder="decimal places" v-model="precision" @blur="roundPrecision">
             <p/>
@@ -108,14 +109,15 @@
               <div v-for="column in table.columns" class="field-info">
                 <strong>{{ table_name | capitalize }}.{{ column.name }}</strong>
                 <div>{{ column.description }} <i>Type: {{ column.type }}</i></div>
-                <button v-show="showAddList(table_name + '.' + column.name)" class="btn-info float-right" @click="addFoa(table_name + '.' + column.name)">Add</button>
+                <button class="btn-info float-right" @click="addFoa(table_name + '.' + column.name)">Add</button>
               </div>
             </div>
           </div>
           
         </transition-group>
         
-        <canvas v-show="activePanel=='summary' && categorized" id="myChart" width="100%" height="30vh"></canvas>
+        <canvas id="myChart" width="100%" height="30vh"></canvas>
+
 
 
     </div>
@@ -181,21 +183,23 @@
     },
     computed: {
         chartLabels: function(){
-          if(this.categorized){
+          if(this.categorized == null || !Object.keys(this.categorized).length){
+            return []
+
+          } else {
             var fieldname = Object.keys(this.categorized)[0]
             var field_category = this.categorized[fieldname]
             return field_category.map(x => { return x[0]})
-          } else {
-            return []
           }
         },
         chartData: function(){
-          if(this.categorized){
+          if(this.categorized == null || !Object.keys(this.categorized).length){
+            return []
+          } else {
             var fieldname = Object.keys(this.categorized)[0]
             var field_category = this.categorized[fieldname]
             return field_category.map(x => {return x[1]})
-          } else {
-            return []
+            
           }
         },
         configsURL: function(){
@@ -225,13 +229,12 @@
             this.activePanel = 'summary'
             this.load()
             this.flash('Sumo saved', 'success', { timeout: 2000 });
-            this.calcStats()
           }).catch(error => {
             this.error = error;
           });
       },
       showAddList(column){
-        if(column.toLowerCase() == this.foa.toLowerCase){
+        if(column.toLowerCase() == this.foa.toLowerCase()){
           return false
         }
         return true
@@ -274,19 +277,6 @@
       },
       getStats(){
         axios.get(this.configsURL + '/' + this.id + '/stats').then( 
-            response => { 
-                this.stats = response.data.fields
-                this.categorized = response.data.categorized
-                myChart.data.datasets[0].data = this.chartData
-                myChart.data.labels = this.chartLabels
-                myChart.update()
-            }
-        ).catch(error => {
-          this.error = error
-        })
-      },
-      calcStats(){
-        axios.get(this.configsURL + '/' + this.id + '/calc_stats').then( 
             response => { 
                 this.stats = response.data.fields
                 this.categorized = response.data.categorized

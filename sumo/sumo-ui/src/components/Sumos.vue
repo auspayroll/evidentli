@@ -50,10 +50,8 @@
         axios.interceptors.request.use(request => {
             return request
         });
-        console.log(this.sumosURL)
         axios.get(this.sumosURL).then( 
             response => { 
-                console.log(response.data)
                 this.sumos = response.data
             }
         ).catch(error => {

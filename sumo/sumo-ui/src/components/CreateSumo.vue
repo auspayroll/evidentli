@@ -12,13 +12,19 @@
             <div v-show="error" class="alert-danger">{{ error }}</div>
             
             <h4>Cohorts</h4>
-            <textarea style="height:90px;font-size:large" v-model="cohorts" placeholder="enter cohort names, separated by command, eg. A, B, C etc.."></textarea>
+            <input type="text" style="font-size:large" v-model="cohort1" placeholder="Cohort 1">
+
+            <input type="text" style="font-size:large" v-model="cohort2" placeholder="Cohort 2">
 
             <p/>
-            <h4>Fields of analysis</h4>
-            <textarea style="height:90px;font-size:large" v-model="matchedPairs" rows="3" placeholder="enter OMOP field names, seperated by commas"></textarea>
+            <h4>Field of analysis</h4>
+            <input style="font-size:large; width:90%" v-model="foa" placeholder="eg. Person.year_of_birth"></input>
 
             <p/>
+
+            Exposure Level <br/><input type="text" style="width:90%" placeholder="category name or threshold value" v-model="exposure_level">
+            <p/>
+            Category Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="category threshold values separated by commas eg, 50, 100, 150">
             <button name="save" type="button" class="btn-success" @click="save">Save</button>
             <p/>
             <h3>OMOP Fields</h3>
@@ -27,7 +33,7 @@
               <div v-for="column in table.columns" class="field-info">
                 <strong>{{ table_name | capitalize }}.{{ column.name }}</strong>
                 <div>{{ column.description }} <i>Type: {{ column.type }}</i></div>
-                <button v-show="showAddList(table_name + '.' + column.name)" class="btn-info float-right" @click="addMatchedPair(table_name + '.' + column.name)">Add</button>
+                <button class="btn-info float-right" @click="addFoa(table_name + '.' + column.name)">Add</button>
               </div>
             </div>
 
@@ -45,11 +51,15 @@
     props: ["projectId"],    
     data: function(){
       return {
-        cohorts: '',
+        cohort1: '',
+        cohort2: '',
+        foa: '',
         name: '', 
         error: '',
         matchedPairs: '',
-        schema: null
+        schema: null,
+        categories: '',
+        exposure_level: ''
       }
     },
     mounted(){
@@ -79,10 +89,11 @@
     },
     methods: {
       save(){
-            var saveObject = { cohorts: this.cohorts, matched_pairs: this.matchedPairs, name: this.name }
+            var cohorts = this.cohort1 + ', ' + this.cohort2
+            var saveObject = { cohorts: cohorts, foa: this.foa, 
+              name: this.name, exposure_level: this.exposure_level, categories: this.categories }
             axios.post(this.configsURL, saveObject).then( response => {
               var _id = response.data._id
-              console.log(_id)
               this.flash('Sumo saved', 'success', { timeout: 2000 });
               this.$router.push({name: 'sumo', params: { id: _id } })
             }).catch(error => {
@@ -99,21 +110,19 @@
         })
       },
       showAddList(column){
-        var mpl = this.matchedPairsList.map(x => { return x.toLowerCase()})
-        if(mpl.includes(column.toLowerCase())){
+        console.log('here')
+        if(column.toLowerCase() == this.foa.toLowerCase()){
           return false
         }
         return true
       },
-      addMatchedPair(column){
+      addFoa(column){
         column = column.charAt(0).toUpperCase() + column.slice(1)
-        if(this.matchedPairsList.includes(column)){
+        if(column.toLowerCase() == this.foa.toLowerCase){
           return false
         } else {
-          if(this.matchedPairs !== '' ){
-            this.matchedPairs += ', '
-          }
-          this.matchedPairs += column
+          this.foa = column
+          return true
         }
       },
 
