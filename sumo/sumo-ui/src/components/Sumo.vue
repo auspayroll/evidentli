@@ -182,14 +182,18 @@
     computed: {
         chartLabels: function(){
           if(this.categorized){
-            return this.categorized.map(x => { return x[0]})
+            var fieldname = Object.keys(this.categorized)[0]
+            var field_category = this.categorized[fieldname]
+            return field_category.map(x => { return x[0]})
           } else {
             return []
           }
         },
         chartData: function(){
           if(this.categorized){
-            return this.categorized.map(x => {return x[1]})
+            var fieldname = Object.keys(this.categorized)[0]
+            var field_category = this.categorized[fieldname]
+            return field_category.map(x => {return x[1]})
           } else {
             return []
           }
@@ -205,7 +209,6 @@
               return this.cohorts.split(',').map(cohort => { return cohort.trim()})
             } catch(err) {
               console.log(err)
-              console.log(this.cohorts)
               return []
             }
           }
@@ -274,7 +277,6 @@
             response => { 
                 this.stats = response.data.fields
                 this.categorized = response.data.categorized
-                console.log(myChart)
                 myChart.data.datasets[0].data = this.chartData
                 myChart.data.labels = this.chartLabels
                 myChart.update()

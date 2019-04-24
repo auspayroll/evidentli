@@ -22,6 +22,8 @@ class Sumo(Model):
 
     @property
     def stats_by_field(self):
+        #import pdb
+        #pdb.set_trace()
         if not self.stats:
             return []
 
@@ -113,11 +115,14 @@ class Sumo(Model):
 
 
     def _calc_stats(self):
-        categorized = {}
-        self.stats = { "categorized": [], "cohorts" : { key: { k: { "mean": None, "std": None, "median": None, "iqr": None, 
+        
+        self.stats = { "categorized": { k: None for k in self._field_list }, 
+                    "cohorts" : { key: { k: { "mean": None, "std": None, "median": None, "iqr": None, 
                     "ratio": None, "n": 0, 'exposures': 0 } for k in self._field_list } for key in self._cohort_list }}
         no_patients = len(self._patients)
+
         for field in self._field_list:
+            categorized = {}
             table, fieldname = field.split('__')
             for patient in self._patients:
                 try:
@@ -153,9 +158,10 @@ class Sumo(Model):
                         cat_counts = categorized.setdefault(category, 0)
                         categorized[category] += 1
 
-        self.stats["categorized"] = [(k, v) for k, v in categorized.items()]
-        self.stats["categorized"].sort(key=lambda x: list(map(lambda y: (float(y[1]),y[0]), [x[0].split(' ')]))[0])
-        print(self.stats["categorized"])
+            self.stats["categorized"][field] = [(k, v) for k, v in categorized.items()]
+            if self._patient_values[patient.cohort][field]:   #numeric values, sort categories
+                self.stats["categorized"][field].sort(key=lambda x: list(map(lambda y: (float(y[1]),y[0]), [x[0].split(' ')]))[0])
+
 
         for field in self._field_list:
             for patient in self._patients:
