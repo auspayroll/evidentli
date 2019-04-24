@@ -1,0 +1,60 @@
+FROM registry:5000/base_python27_centos7
+
+
+#run curl -O  http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+#run rpm -ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm
+RUN yum update -y
+
+
+RUN yum install -y nginx supervisor
+RUN yum install -y libxslt-devel libxml2-devel
+RUN yum install -y libffi-devel xmlsec1 xmlsec1-openssl
+RUN yum install -y zlib-devel openssl-devel sqlite-devel bzip1-devel git
+
+
+# install uwsgi now because it takes a little while
+RUN pip install uwsgi
+
+
+# install nginx
+#run yum install -y software-properties-common python-software-properties
+
+# Install supervisord (required to run more than a single process in a container)
+# # Note: EPEL package lacks /usr/bin/pidproxy
+# # We require supervisor-stdout to allow output of services started by
+# # supervisord to be easily inspected with "docker logs".
+
+RUN pip install --upgrade 'pip >= 1.4, < 1.5' wheel setuptools
+RUN pip install --upgrade supervisor supervisor-stdout
+RUN mkdir -p /var/log/supervisor/
+
+WORKDIR /home/docker/code
+VOLUME /home/docker/code/app
+
+# install initial setup configs
+#ADD . /home/docker/code/
+ADD /rondo/docker /home/docker/code/docker
+ADD /rondo /home/docker/code/rondo
+ADD /orm /home/docker/code/orm
+ADD config.py /home/docker/code/
+ADD run_rondo.py /home/docker/code/
+
+
+# install python requirements
+RUN pip install -r /home/docker/code/rondo/requirements.txt
+ARG CACHEBUST=1
+#RUN pip install git+https://bitbucket.org/evidentli/pianoauth.git
+
+# setup all the configfiles
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+#run rm /etc/nginx/sites-enabled/default
+RUN ln -s /home/docker/code/docker/nginx-app.conf /etc/nginx/conf.d/ ; \
+rm -f /etc/supervisord.conf ; \
+mkdir -p /etc/supervisor/conf.d/ ; \
+ln -s /usr/bin/uwsgi /usr/local/bin/uwsgi ; \
+ln -s /home/docker/code/docker/supervisor-app.conf /etc/supervisor/conf.d/ ; \
+ln -s /home/docker/code/docker/supervisord.conf /etc/supervisor/supervisord.conf ; \
+ln -s /home/docker/code/docker/supervisord.conf /etc/supervisord.conf
+
+EXPOSE 5012
+CMD ["supervisord", "-n"]
