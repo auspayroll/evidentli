@@ -51,14 +51,18 @@ class TestRondo(unittest.TestCase):
         rondo._patients = list(self._patients.values())
         patient = self._patients["1"]
         matched_patients = rondo.match_patient(patient)
-        assert matched_patients[0]._id == '2'
+        matched_patient_ids = [int(mp._id) for mp in rondo.matched_patients]
+        matched_patient_ids.sort()
+        assert  matched_patient_ids == [2,5]
 
     def test_matchedPairMultipleField(self):
         rondo = Rondo(project_id=self.project_id, cohorts='A,B', matched_pairs='Person.test_field1, Measurement.val_as_int')
         rondo._patients = list(self._patients.values())
         patient = self._patients["1"]
         matched_patients = rondo.match_patient(patient)
-        assert matched_patients[0]._id == '2'
+        matched_patient_ids = [int(mp._id) for mp in rondo.matched_patients]
+        matched_patient_ids.sort()
+        assert  matched_patient_ids == [2,5]
 
     def test_matchedPairMultipleCohort(self):
         rondo = Rondo(project_id=self.project_id, cohorts='A,B,C', matched_pairs='Person.test_field1, Measurement.val_as_int')
