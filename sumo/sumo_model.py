@@ -135,7 +135,7 @@ class Sumo(Model):
                         value = None
                     else: # auto categorize + set exposure
                         self.stats['cohorts'][patient.cohort][field]['n'] += 1
-                        if value == self.exposure_level:
+                        if self.exposure_level and value and value.lower() == self.exposure_level.lower():
                             self.stats['cohorts'][patient.cohort][field]['exposures'] += 1
                         cat_counts = categorized.setdefault(value, 0)
                         categorized[value] = cat_counts + 1
@@ -177,7 +177,7 @@ class Sumo(Model):
                 n = self.stats['cohorts'][patient.cohort][field]['n']
                 if n:
                     exposures = self.stats['cohorts'][patient.cohort][field]['exposures']
-                    self.stats['cohorts'][patient.cohort][field]['ratio'] = exposures / n
+                    self.stats['cohorts'][patient.cohort][field]['ratio'] = exposures / float(n)
 
         cohort_list = self._cohort_list
         if cohort_list and len(cohort_list) > 1:
