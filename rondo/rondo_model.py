@@ -116,16 +116,7 @@ class Rondo(Model):
                 l.append("%s.%s" % (k,v))
         return l
 
-    """
-    deprecated
-    def match_patient(self, patient):
-        find_match = self._matched_pairs_dict
-        if not find_match: 
-            return []
-        pair_id = uuid.uuid4().hex
-        matched_patients = self._match_patient(patient, find_match, pair_id)
-        return matched_patients
-    """
+
     def _load_patients(self, limit=None):
         matched_pairs_dict = self._matched_pairs_dict
         if type(self._patients) is list:
@@ -173,6 +164,8 @@ class Rondo(Model):
         patient.pair_id = uuid.uuid4().hex
 
         # go through each cohort..
+        #import pdb
+        #pdb.set_trace()
         for cohort, patient_cohort in self.patient_cohorts.items():
             if cohort == patient.cohort or not cohort:
                 continue #if the same cohort
@@ -201,18 +194,9 @@ class Rondo(Model):
         if 'pair_id' in patient._field_updates:
             patient.pair_id = None
             del patient._field_updates['pair_id']
-        return patient_pairs
+        self.matched_patients = patient_pairs
+        return self.matched_patients
 
-    @property
-    def matched_patients(self):
-        if not self._patients:
-            return None
-        mpd = {}
-        for pat in self._patients:
-            if pat.pair_id:
-                mpl = mpd.setdefault(pat.pair_id, [])
-                mpl.append(pat)
-        return mpd
 
     def match_patients(self):
         self._load_patients()
