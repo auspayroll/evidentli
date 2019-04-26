@@ -23,7 +23,6 @@ class TestSumo(unittest.TestCase):
     def tearDown(self):
         pass
 
-    
     def test_stats_mean(self):
         sumo = self.sumo
         sumo.analyse()
@@ -132,9 +131,8 @@ class TestSumo(unittest.TestCase):
             _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in patients.items()]
         self.sumo.exposure_level = 'A'
         self.sumo.analyse()
-        assert self.sumo.stats['comparison'][self.foa]['OR'] == (2/3) / (1/2)
+        assert self.sumo.stats['comparison'][self.foa]['OR'] == (2.0/3.0) / (1.0/2.0)
 
-     
     def test_odds_ratio_numeric(self):
         patients = {
             "1": { "cohort": 'A', "pair_id": '3454354WWWW', 'test_val': 1 }, 
@@ -147,7 +145,8 @@ class TestSumo(unittest.TestCase):
             _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in patients.items()]
         self.sumo.exposure_level = 3
         self.sumo.analyse()
-        assert self.sumo.stats['comparison'][self.foa]['OR'] == (2/3) / (1/2)
+        assert self.sumo.stats['comparison'][self.foa]['OR'] == (2.0/3.0) / (1.0/2.0)
+    
 
 if __name__ == '__main__':
     unittest.main()
