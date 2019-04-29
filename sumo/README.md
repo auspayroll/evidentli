@@ -36,13 +36,13 @@ Usage examples can be found in the package [test.py](test/test.py) file
 
 ## Matched Pairs
 
-If there are two Cohorts specified, SUMO will automatically generate statistic information on matched paired patients. Patients must have already been paired with matching `pair_id` field in the `Crubicle` database, typically allocated in a previous stage of a workflow. 
+If there are two Cohorts specified, SUMO will automatically generate statistic information on matched paired patients. Patients must have already been paired with a matching `pair_id` field in the `Crubicle` database, typically allocated in a previous stage of a workflow. 
 
 ---
 
 ## Odds Ratio
 
-SUMO will try to calcaulate an odds ratio based on the field of analysis `foa` and `exposure_level` fields. 
+SUMO will try to calculate an odds ratio based on the field of analysis `foa` and `exposure_level` fields. 
 
 ``sumo = Sumo(project_id='test_rondo_integration, cohorts='A,B', foa='Person.day_of_birth', exposure_level=20)``
 
@@ -59,7 +59,7 @@ If the field of analysis `foa` is nominal, any field value equal to the `exposur
 
 ## Category levels
 
-If the field of anaysis is numeric, SUMO will automatically calculate category counts based on the SUMO ``category_levels`` fields. Multiple category levels are seperated by commas or specified by a Python list. 
+If the field of analysis is numeric, SUMO will automatically calculate category counts based on the SUMO ``category_levels`` fields. Multiple category levels can be seperated by commas or specified by a Python list. 
 
 ``sumo = Sumo(project_id='test_rondo_integration, cohorts='A,B', foa='Person.day_of_birth', category_levels='15,20,25')``
 
@@ -79,7 +79,9 @@ After `analyse` is run, sumo will contain a Python dictionary of the category co
 ### Creating / updating SUMO objects
 
 SUMO objects are created and updated on the same endpoint, ie a ``POST`` to
-``/projects/<project_id>/sumos``. If an ``_id`` is present in the posted data, the corresponding SUMO
+``/projects/<project_id>/sumos``. 
+
+If an ``_id`` is present in the posted data, the corresponding SUMO
 object is updated, returning the updated object itself, otherwise a new record is created and returned. 
 
 ### Retrieving SUMO objects
