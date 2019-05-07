@@ -57,7 +57,7 @@ If the field of analysis `foa` is nominal, any field value equal to the `exposur
 
 ---
 
-## Category levels
+## Distributions
 
 If the field of analysis is numeric, SUMO will automatically calculate category counts based on the SUMO ``category_levels`` fields. Multiple category levels can be seperated by commas or specified by a Python list. 
 
@@ -65,11 +65,9 @@ If the field of analysis is numeric, SUMO will automatically calculate category 
 
 ``sumo.analyse()``
 
-After `analyse` is run, sumo will contain a Python dictionary of the category counts via the SUMO `categorized` property. 
+After `analyse` is run, sumo will contain a Python dictionary of the distribution via the SUMO `distrubution` property. 
 
-
-
-``sumo.categorized``
+``sumo.distribution``
 
 ---
 

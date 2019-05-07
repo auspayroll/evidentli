@@ -24,7 +24,7 @@
 
             Exposure Level <br/><input type="text" style="width:90%" placeholder="category name or threshold value" v-model="exposure_level">
             <p/>
-            Category Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="category threshold values separated by commas eg, 50, 100, 150">
+            Distribution Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="distribution threshold values separated by commas eg, 50, 100, 150">
             <button name="save" type="button" class="btn-success" @click="save">Save</button>
             <p/>
             <h3>OMOP Fields</h3>

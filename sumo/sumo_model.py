@@ -22,8 +22,6 @@ class Sumo(Model):
 
     @property
     def stats_by_field(self):
-        #import pdb
-        #pdb.set_trace()
         if not self.stats:
             return []
 
@@ -39,7 +37,7 @@ class Sumo(Model):
         for field_name, field_stats in self.stats["comparison"].items():
             field_dict[field_name]['comparison'] = field_stats 
 
-        stats = { "fields": field_dict, "categorized": self.stats['categorized'] }    
+        stats = { "fields": field_dict, "distribution": self.stats['distribution'] }    
 
         return stats
 
@@ -115,8 +113,7 @@ class Sumo(Model):
 
 
     def _calc_stats(self):
-        
-        self.stats = { "categorized": { k: None for k in self._field_list }, 
+        self.stats = { "distribution": { k: None for k in self._field_list }, 
                     "cohorts" : { key: { k: { "mean": None, "std": None, "median": None, "iqr": None, 
                     "ratio": None, "n": 0, 'exposures': 0 } for k in self._field_list } for key in self._cohort_list }}
         no_patients = len(self._patients)
@@ -126,8 +123,7 @@ class Sumo(Model):
             table, fieldname = field.split('__')
             for patient in self._patients:
                 try:
-                    value = float(getattr(patient, "_%s" % (table)).get(fieldname))
-                    
+                    value = float(getattr(patient, "_%s" % (table)).get(fieldname))           
                 except: 
                     try: #value is a string 
                         value = getattr(patient, "_%s" % (table)).get(fieldname) 
@@ -149,7 +145,6 @@ class Sumo(Model):
                                     self.stats['cohorts'][patient.cohort][field]['exposures'] += 1
                             except:
                                 pass
-
                         else:
                             self.stats['cohorts'][patient.cohort][field]['exposures'] += 1
 
@@ -157,10 +152,18 @@ class Sumo(Model):
                         category = utils.categorize_by_list(self.category_list, value)
                         cat_counts = categorized.setdefault(category, 0)
                         categorized[category] += 1
-
-            self.stats["categorized"][field] = [(k, v) for k, v in categorized.items()]
+            
             if self._patient_values[patient.cohort][field]:   #numeric values, sort categories
-                self.stats["categorized"][field].sort(key=lambda x: list(map(lambda y: (float(y[1]),y[0]), [x[0].split(' ')]))[0])
+                self.stats["distribution"][field] = [(k, v) for k, v in categorized.items()]
+                self.stats["distribution"][field].sort(key=lambda x: list(map(lambda y: (float(y[1]),y[0]), [x[0].split(' ')]))[0])
+            elif self.category_list:
+                distribution = []
+                for ordinal in self.category_list:
+                    ordinal_val = categorized.get(ordinal)
+                    if ordinal_val:
+                        distribution.append((ordinal, ordinal_val))
+            else:
+                self.stats["distribution"][field] = [(k, v) for k, v in categorized.items()]
 
 
         for field in self._field_list:
@@ -183,8 +186,6 @@ class Sumo(Model):
         if cohort_list and len(cohort_list) > 1:
             self.stats["comparison"] = self.compare_cohorts(cohort_list[0], cohort_list[1])
             self.stats["matched_pairs"] = self.compare_cohort_matched_pairs(cohort_list[0], cohort_list[1])
-
-            
 
 
     @property

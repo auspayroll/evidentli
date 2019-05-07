@@ -98,10 +98,10 @@ class TestSumo(unittest.TestCase):
         sumo = self.sumo
         sumo.categories = '11,7'
         sumo.analyse()
-        category_list = self.sumo.stats['categorized'][self.foa]
-        assert [v for (k,v) in category_list if k == '< 7.0'][0] == 2
-        assert [v for (k,v) in category_list if k == '> 11.0'][0] == 1
-        assert [v for (k,v) in category_list if k == '<= 11.0'][0] == 1
+        distribution = self.sumo.stats['distribution'][self.foa]
+        assert [v for (k,v) in distribution if k == '< 7.0'][0] == 2
+        assert [v for (k,v) in distribution if k == '> 11.0'][0] == 1
+        assert [v for (k,v) in distribution if k == '<= 11.0'][0] == 1
 
 
     def test_odds_cateogries_nominal(self):
@@ -115,9 +115,9 @@ class TestSumo(unittest.TestCase):
         self.sumo._patients = [ Patient.create(_project_id=self.project_id, _id=k,
             _Person={ self.foa.split('__')[1]: v['test_val']}, **v) for k,v in patients.items()]
         self.sumo.analyse()
-        category_list = self.sumo.stats['categorized'][self.foa]
-        assert [v for (k,v) in category_list if k == 'A'][0] == 3
-        assert [v for (k,v) in category_list if k == 'B'][0] == 1
+        distribution = self.sumo.stats['distribution'][self.foa]
+        assert [v for (k,v) in distribution if k == 'A'][0] == 3
+        assert [v for (k,v) in distribution if k == 'B'][0] == 1
 
     def test_odds_ratio_nominal(self):
         patients = {

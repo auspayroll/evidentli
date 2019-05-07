@@ -8,10 +8,7 @@
           <button :class="activePanel == 'cohort' ? 'btn-primary': 'btn-secondary'" @click="activePanel='cohort'">Cohorts</button>
           <button  :class="activePanel == 'pairs' ? 'btn-primary': 'btn-secondary'" @click="activePanel='pairs'">Fields of analysis</button>
         </div>  
-
-
         <transition-group name="fade" mode="out-in" class="panel">
-
           <div key="summary" class="panel" v-show="activePanel=='summary'">
 
             <div v-for="field_stat, field_name in stats">
@@ -60,14 +57,11 @@
                     <td></td>
                   </tr> 
 
-              </table>
-              
+              </table>       
             <p>
               Precision/rounding <br/><input type="number" placeholder="decimal places" v-model="precision" @change="roundPrecision">
             </p>        
-            </div>
-
-               
+            </div>        
           </div>
 
           <div key="cohorts" class="panel" v-show="activePanel=='cohort'">
@@ -81,11 +75,9 @@
             <input type="text" style="font-size:large" v-model="cohort1" placeholder="Cohort 1">
 
             <input type="text" style="font-size:large" v-model="cohort2" placeholder="Cohort 2">
-              
             
             <button name="save" type="button" class="btn-success" @click="save">Save</button>
           </div>
-
 
           <div key="pairs" class="panel" v-show="activePanel=='pairs'">
             <p/>
@@ -97,7 +89,7 @@
 
             Exposure Level <br/><input type="text" style="width:90%" placeholder="category name or threshold value" v-model="exposure_level">
             <p/>
-            Category Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="category threshold values separated by commas eg, 50, 100, 150">
+            Distribution Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="distribution threshold values separated by commas eg, 50, 100, 150">
             <p/>
             <button name="save" type="button" class="btn-success" @click="save">Save</button>
             <p/>
@@ -115,13 +107,8 @@
           </div>
           
         </transition-group>
-        
         <canvas id="myChart" v-show="activePanel=='summary'" width="100%" height="30vh"></canvas>
-
-
-
     </div>
-
 </template>
 
 <script>
@@ -148,7 +135,8 @@
         stats:null,
         search: '',
         precision: null,
-        categorized: null
+        distribution: null,
+        ordinals: ''
       }
     },
     created(){
@@ -183,21 +171,21 @@
     },
     computed: {
         chartLabels: function(){
-          if(this.categorized == null || !Object.keys(this.categorized).length){
+          if(this.distribution == null || !Object.keys(this.distribution).length){
             return []
 
           } else {
-            var fieldname = Object.keys(this.categorized)[0]
-            var field_category = this.categorized[fieldname]
+            var fieldname = Object.keys(this.distribution)[0]
+            var field_category = this.distribution[fieldname]
             return field_category.map(x => { return x[0]})
           }
         },
         chartData: function(){
-          if(this.categorized == null || !Object.keys(this.categorized).length){
+          if(this.distribution == null || !Object.keys(this.distribution).length){
             return []
           } else {
-            var fieldname = Object.keys(this.categorized)[0]
-            var field_category = this.categorized[fieldname]
+            var fieldname = Object.keys(this.distribution)[0]
+            var field_category = this.distribution[fieldname]
             return field_category.map(x => {return x[1]})
             
           }
@@ -279,7 +267,7 @@
         axios.get(this.configsURL + '/' + this.id + '/stats').then( 
             response => { 
                 this.stats = response.data.fields
-                this.categorized = response.data.categorized
+                this.distribution = response.data.distribution
                 myChart.data.datasets[0].data = this.chartData
                 myChart.data.labels = this.chartLabels
                 myChart.update()
@@ -299,8 +287,6 @@
       }
     }
   }
-
-
 </script>
 
 <style scoped>
