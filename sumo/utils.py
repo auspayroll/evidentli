@@ -8,15 +8,16 @@ class ModelJsonEncoder(JSONEncoder):
             if k[0] != '_':
                 items[k] = str(v)
         return items
-
+    
 def sanitize_key(key):
 	""" 
 	sanitizes for storage in mongodb 
 	"""
-	key = key.strip()
 	sanitized = []
 	for i, char in enumerate(key):
-		if char != ' ' and char < '0' or char > 'z' or char == "\\":
+		if char == '.':
+			sanitized.append('__')
+		elif char != ' ' and char < '0' or char > 'z' or char == "\\":
 			sanitized.append('_')
 		else:
 			sanitized.append(char)
@@ -30,9 +31,9 @@ def _split_string(value, sanitize=True):
 	if split_on not in value:
 		split_on = ' '
 	if sanitize:
-		keywords = [sanitize_key(x) for x in value.split(split_on)]
+		keywords = [sanitize_key(x.strip()) for x in value.split(split_on)]
 	else: 
-		keywords = [x for x in value.split(split_on)]
+		keywords = [x.strip() for x in value.split(split_on)]
 	value_list = list(dict.fromkeys(keywords))
 	return value_list
 
