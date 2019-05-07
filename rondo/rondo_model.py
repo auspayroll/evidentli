@@ -4,11 +4,12 @@ from random import randint
 from orm.model import Model
 from orm.patient import Patient
 from orm import omop
+from . import utils
 
 
 class Rondo(Model):
     _name = "rondo"
-    _fields = { 'cohorts': str, 'matched_pairs': str, 'match_by_cohort': bool, 'name': str }
+    _fields = { 'cohorts': str, 'matched_pairs': str, 'random': bool, 'name': str }
 
     def allocate_random_cohort(self, patient, force=False):
         # allocat random cohort to patient, deterministically based on _id
@@ -36,34 +37,6 @@ class Rondo(Model):
         for patient in self._patients:
             self.allocate_random_cohort(patient, force=True)
 
-        
-    def _match_patient(self, patient, criteria_dict, pair_id):
-        """
-        deprecated
-        private method to find matching patients and update with pair_id
-        criteria_dict = { 'Person': ['field1', 'field2'], ...}
-        """
-        matched_patient_ids = omop.match_patient(patient._project_id, patient.person_id, criteria_dict)
-        matched_patients = Patient.filter(project_id=patient._project_id, person_id=matched_patient_ids, omop='Person')
-        matched_cohorts = [patient.cohort]
-        matched_patient_list = []
-        if matched_patients:
-            for matched_patient in matched_patients:
-                if matched_patient._id == patient._id:
-                    continue
-                if not matched_patient.pair_id: #skip if already paired
-                    matched_patient.pair_id = pair_id
-                    if self.match_by_cohort and matched_patient.cohort not in matched_cohorts:
-                        matched_cohorts.append(matched_patient.cohort)
-                    matched_patient.save()
-                    matched_patient_list.append(matched_patient)
-                    if patient.pair_id != pair_id:
-                        patient.pair_id = pair_id
-                        patient.save()
-                    if not self.match_by_cohort: 
-                        # there are no cohorts, so return only one match
-                        return matched_patient_list
-        return matched_patient_list
 
     @property
     def patient_cohorts(self):
@@ -74,15 +47,9 @@ class Rondo(Model):
             cohort_list.append(patient)
         return cohort_dict
 
-
     @property
     def _cohort_list(self):
-        split_on = ','
-        if split_on not in self.cohorts:
-            split_on = ' '
-        keywords = [x.strip() for x in self.cohorts.split(split_on)]
-        cohort_list = list(dict.fromkeys(keywords))
-        return cohort_list
+        return utils._split_string(self.cohorts)
 
     @property
     def _matched_pairs_dict(self):
@@ -90,12 +57,7 @@ class Rondo(Model):
         if not self.matched_pairs:
             return kw
 
-        split_on = ','
-        if split_on not in self.matched_pairs:
-            split_on = ' '
-            
-        keywords = [x.strip() for x in self.matched_pairs.split(split_on)]
-
+        keywords = utils._split_string(self.matched_pairs)
         keywords = list(dict.fromkeys(keywords))
         for keyword in keywords:
             try:
@@ -163,9 +125,6 @@ class Rondo(Model):
 
         patient.pair_id = uuid.uuid4().hex
 
-        # go through each cohort..
-        #import pdb
-        #pdb.set_trace()
         for cohort, patient_cohort in self.patient_cohorts.items():
             if cohort == patient.cohort or not cohort:
                 continue #if the same cohort
