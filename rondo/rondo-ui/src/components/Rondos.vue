@@ -19,10 +19,10 @@
                     {{ rondo.name }}
                 </td>
                 <td>
-                    {{ rondo.cohorts?rondo.cohorts.length:'-' }}
+                    {{ rondo.cohorts }}
                 </td>
                   <td>
-                    {{ rondo.matched_pairs?rondo.matched_pairs.length:'-' }}
+                    {{ rondo.matched_pairs }}
                 </td>
             </tr>
         </table>

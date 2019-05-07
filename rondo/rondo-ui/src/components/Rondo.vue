@@ -1,65 +1,65 @@
 <template>
   <div>
+    
         <h1>Rondo</h1><p>
         Project {{ projectId }}
         <flash-message transitionName="slide-fade"></flash-message>
-        <div class="nav">
+        <div class="nav" v-if="id">
           <button :class="activePanel == 'summary' ? 'btn-primary': 'btn-secondary'" @click="activePanel='summary'">Summary</button>
           <button :class="activePanel == 'cohort' ? 'btn-primary': 'btn-secondary'" @click="activePanel='cohort'">Cohorts</button>
-          <button  :class="activePanel == 'pairs' ? 'btn-primary': 'btn-secondary'" @click="activePanel='pairs'">Matched Pairs</button>
-        </div>
-        
+        </div>   
 
         <transition-group name="fade" mode="out-in" class="panel">
 
-          <div key="summary" class="panel" v-if="activePanel=='summary'">
-
+          <div key="summary" class="panel" v-if="activePanel=='summary' && id">
             <h4>Rondo Name</h4>
             {{ name || '-' }}
             <hr/>
-            <h4>Cohorts</h4>
+            
+            <h4><span v-show="random">Random</span> Cohorts</h4>
               <li v-for="mp in cohortList"><button class="btn-info tag">{{ mp }}</button></li>
             <hr/>
-            <h4>Matched Pairs</h4>
-            <ul>
-              <li v-for="mp in matchedPairsList"><button class="btn-info tag">{{ mp }}</button></li>
-            </ul>
-
+            <div v-show="!random">
+              <h4>Matched Pairs</h4>
+              <ul>
+                <li v-for="mp in matchedPairsList"><button class="btn-info tag">{{ mp }}</button></li>
+              </ul>
+            </div>
           </div>
-
 
           <div key="cohorts" class="panel" v-if="activePanel=='cohort'">
 
-            <h4>Rondo Name</h4>
-            <input name="new_cohort" type="text" placeholder="RONDO name" ref="name" v-model="name"> 
-            <p/>
-            <div v-show="error" class="alert-danger">{{ error }}</div>
+              <h4>Rondo Name</h4>
+              <input name="new_cohort" type="text" placeholder="RONDO name" ref="name" v-model="name"> 
+              <p/>
+              <div v-show="error" class="alert-danger">{{ error }}</div>
 
-            <h4>Cohorts</h4>
-            <textarea style="height:90px;font-size:large" v-model="cohorts" placeholder="enter cohort labels/names, separated by commas, eg. Cohort1, Cohort2, Cohort 3; ">
-              
-            </textarea>
-            <button name="save" type="button" class="btn-success" @click="save">Save</button>
-          </div>
+              <h4>Cohorts</h4>
+              <input style="font-size:large; width:90%" v-model="cohorts" placeholder="enter cohort labels/names, separated by commas, eg. Cohort1, Cohort2, Cohort 3; ">
+              <p>
+              <input type="checkbox" v-model="random"> Allocate as random cohorts
+              </p>
+              <button name="save" type="button" class="btn-success" @click="save" v-show="random==true">Save</button>
 
-
-          <div key="pairs" class="panel" v-if="activePanel=='pairs'">
-            <p/>
-            <h4>Matched Pairs</h4>
-            <textarea style="height:90px;font-size:large" v-model="matchedPairs" rows="3" placeholder="enter field names, seperated by commas, eg. Person.provider_id, Person.year_of_birth"></textarea>
-            <!--<input type="checkbox" v-model="matchByCohort"> Match by Cohort-->
-            <button name="save" type="button" class="btn-success" @click="save">Save</button>
-            <p/>
-            
-            <h3>OMOP Fields</h3>
-            <div v-if="!schema">Loading...</div>
-            <div v-for="table, table_name in schema">
-              <div v-for="column in table.columns" class="field-info">
-                <strong>{{ table_name | capitalize }}.{{ column.name }}</strong>
-                <div>{{ column.description }} <i>Type: {{ column.type }}</i></div>
-                <button v-show="showAddList(table_name + '.' + column.name)" class="btn-info float-right" @click="addMatchedPair(table_name + '.' + column.name)">Add</button>
+              <div key="pairs" class="panel" v-show="random==false">
+                <p/>
+                <h4>Matched Pairs</h4>
+                <input style="width:90%;font-size:large" v-model="matchedPairs" rows="3" placeholder="enter field names, seperated by commas, eg. Person.provider_id, Person.year_of_birth">
+                <p/>
+                <p>
+                <button name="save" type="button" class="btn-success" @click="save">Save</button></p> 
+                
+                <h3>OMOP Fields</h3>
+                <div v-if="!schema">Loading...</div>
+                <div v-for="table, table_name in schema">
+                  <div v-for="column in table.columns" class="field-info">
+                    <strong>{{ table_name | capitalize }}.{{ column.name }}</strong>
+                    <div>{{ column.description }} <i>Type: {{ column.type }}</i></div>
+                    <button v-show="showAddList(table_name + '.' + column.name)" class="btn-info float-right" @click="addMatchedPair(table_name + '.' + column.name)">Add</button>
+                  </div>
+                </div>
               </div>
-            </div>
+
           </div>
           
         </transition-group>
@@ -71,23 +71,27 @@
 <script>
   var dirty = false;
   import axios from 'axios';
+  const timeout = 2000
 
   export default{
     props: ["projectId", "id"],    
     data: function(){
+      var initPanel = this.id ? 'summary' : 'cohort'
       return {
         cohorts: '',
         name: '', 
         error: '',
-        matchByCohort: false,
         matchedPairs: '', 
-        activePanel: 'summary',
+        activePanel: initPanel,
         schema: null,
+        random: false
       }
     },
     created(){
+      if(this.id){
         this.load()
-        this.get_schema()
+      }
+      this.get_schema()
     },
     mounted(){
         //this.$refs.name.$el.focus()
@@ -104,8 +108,6 @@
               try{
                 return this.matchedPairs.split(',').map(pair => { return pair.trim()})
               } catch(err){
-                console.log(err)
-                console.log(this.matchedPairs)
                 return []
               }
             }
@@ -127,15 +129,16 @@
     methods: {
       save(){
             var saveObject = { cohorts: this.cohorts, matched_pairs: this.matchedPairs, 
-              match_by_cohort: this.matchByCohort, name: this.name, _id: this.id }
+              name: this.name, _id: this.id, random: this.random }
 
             axios.post(this.configsURL, saveObject).then( response => {
-              //this.$router.push('/projects/' + this.projectId + '/rondos')
+              this.flash('Rondo saved', 'success', { timeout });
               this.activePanel = 'summary'
-              this.load()
-              this.flash('Rondo saved', 'success', { timeout: 2000 });
+              if(!this.id){
+                this.$router.push('/projects/' + this.projectId + '/rondos/' + response.data._id)
+              }
             }).catch(error => {
-              this.error = error;
+              this.flash(error, 'error', { timeout });
             });
       },
       showAddList(column){
@@ -158,7 +161,6 @@
         }
       },
       load(){
-        console.log(this.configsURL + '/' + this.id)
         axios.get(this.configsURL + '/' + this.id).then( 
             response => { 
                 this.id = response.data._id
@@ -168,11 +170,11 @@
                 if(response.data.matched_pairs){
                   this.matchedPairs = response.data.matched_pairs.toString()
                 }
-                this.matchByCohort = response.data.match_by_cohort
+                this.random = response.data.random
                 this.name = response.data.name || ''
             }
         ).catch(error => {
-          this.error = error
+          this.flash(error, 'error', { timeout });
         })
       },
       get_schema(){
@@ -181,7 +183,7 @@
                 this.schema = response.data.tables
             }
         ).catch(error => {
-          
+          this.flash(error, 'error', { timeout });
         })
       }
     }

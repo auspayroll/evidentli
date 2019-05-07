@@ -1,9 +1,7 @@
 <template>
   <div>
-
         <span>- <strong>NEW RONDO</strong> -</span>
         <p/>
-   
           <div key="cohort_panel" class="panel">
 
             <h4>Name</h4>
@@ -32,12 +30,6 @@
             </div>
 
           </div>
-
-          
-       
-
-        
-  
     </div>
 
 </template>
@@ -85,6 +77,7 @@
     methods: {
       save(){
             var saveObject = { cohorts: this.cohorts, matched_pairs: this.matchedPairs, name: this.name }
+            console.log(saveObject)
             axios.post(this.configsURL, saveObject).then( response => {
               var _id = response.data._id
               console.log(_id)

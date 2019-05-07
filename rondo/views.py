@@ -77,11 +77,11 @@ def flowfile(project_id, rondo_id):
     json.pop('_project_id', None)
     patient = Patient.create(_project_id=project_id, **json)
     rondo = Rondo.get(project_id=project_id, id=rondo_id)
-    rondo.allocate_random_cohort(patient, force=True)
-    rondo.match_patient(patient)
-    if patient.pair_id:
+    if rondo.random:
+        rondo.allocate_random_cohort(patient, force=True)
         json["pair_id"] = patient.pair_id
-    if patient.cohort:
+    else:
+        rondo.match_patient(patient)
         json['cohort'] = patient.cohort
     return jsn(json)
 
