@@ -16,7 +16,7 @@ Rondo makes use of a simple ORM package (similar to Python Django) to make the c
 
 Once this package is installed, from the python command line, import the Rondo model. 
 
-``> from rondo_model import Rondo``
+``> from rondo import Rondo``
 
 Usage examples can be found in the package [test.py](rondo/test/test.py) file
 
