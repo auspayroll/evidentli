@@ -8,7 +8,7 @@ TESTING = False
 CORS = False
 EOBO_KEY = os.getenv('EOBO_KEY', 'eobo')
 SECRET_KEY = os.getenv('SECRET_KEY', "piano")
-PIANO_API = os.getenv('PIANO_API', "http://dev.api.evidentli.com")
+PIANO_API = os.getenv('PIANO_API', "http://dev.evidentli.com:8181")
 HOST = os.getenv('HOST', "http://0.0.0.0:5012")
 
 try:
