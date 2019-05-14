@@ -7,7 +7,10 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 numpy==1.16.3
+python-dateutil==2.8.0
 python-string-utils==0.6.0
 requests==2.21.0
+-e git+https://45299463@bitbucket.org/evidentli/rondo.git@f5364c8ab9d12dacdabab1f56f4fe15eb85e2e27#egg=rondo
+six==1.12.0
 urllib3==1.24.2
 Werkzeug==0.15.2
