@@ -1,4 +1,5 @@
 from flask.json import JSONEncoder
+import operator
 
 
 class ModelJsonEncoder(JSONEncoder):
@@ -34,8 +35,8 @@ def _split_string(value, sanitize=True):
 		keywords = [sanitize_key(x.strip()) for x in value.split(split_on)]
 	else: 
 		keywords = [x.strip() for x in value.split(split_on)]
-	value_list = list(dict.fromkeys(keywords))
-	return value_list
+	#value_list = list(dict.fromkeys(keywords))
+	return keywords
 
 
 def categorize_by_list(categories, val):
@@ -54,6 +55,82 @@ def categorize_by_list(categories, val):
 	else:
 		cat = '<= %s' % (lt[0] )
 	return cat
+
+def operate(operand1, symbol, operand2):
+	default = 0
+	if symbol == '-':
+		try:
+			return operand1 - operand2
+		except:
+			return default
+	if symbol == '+':
+		try:
+			return operand1 - operand
+		except:
+			return default
+	if symbol == '/':
+		try:
+			return float(operand1) / float(operand2)
+		except:
+			return default
+	elif symbol == '*':
+		try:
+			return float(operand1) * float(operand2)
+		except:
+			return default
+	elif symbol == '>':
+		try:
+			return int(operand1 > operand2)
+		except:
+			return default
+	elif symbol == '>=':
+		try:
+			return int(operand1 >= operand2)
+		except:
+			return default
+	elif symbol == '<':
+		try:
+			return int(operand1 < operand2)
+		except:
+			return default
+	elif symbol == '<=':
+		try:
+			return int(operand1 <= operand2)
+		except:
+			return default
+
+
+def getfieldparts(field_expression):
+	field_parts = [ x.strip() for x in field_expression.split(' ')]
+	yields = []
+	if len(field_parts) in (1,2):
+		try:
+			table, fieldname = field_parts[0].split('.')          
+		except:
+			pass
+		else:
+			yielded = True
+			yields.append((sanitize_key(table.capitalize()), fieldname.lower()))
+
+	elif len(field_parts) >= 3:
+		try:
+			table, fieldname = field_parts[0].split('.')          
+		except:
+			pass
+		else:
+			yielded = True
+			yields.append((sanitize_key(table.capitalize()), fieldname.lower()))
+
+		try:
+			table, fieldname = field_parts[2].split('.')          
+		except:
+			pass
+		else:
+			yielded = True
+			yields.append((sanitize_key(table.capitalize()), fieldname.lower()))
+	
+	for y in yields:
+		yield y
 
 
 

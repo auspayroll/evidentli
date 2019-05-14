@@ -5,8 +5,7 @@
         <flash-message transitionName="slide-fade"></flash-message>
         <div class="nav">
           <button :class="activePanel == 'summary' ? 'btn-primary': 'btn-secondary'" @click="activePanel='summary'">Summary</button>
-          <button :class="activePanel == 'cohort' ? 'btn-primary': 'btn-secondary'" @click="activePanel='cohort'">Cohorts</button>
-          <button  :class="activePanel == 'pairs' ? 'btn-primary': 'btn-secondary'" @click="activePanel='pairs'">Fields of analysis</button>
+          <button  :class="activePanel == 'pairs' ? 'btn-primary': 'btn-secondary'" @click="activePanel='pairs'">Edit</button>
         </div>  
         <transition-group name="fade" mode="out-in" class="panel">
           <div key="summary" class="panel" v-show="activePanel=='summary'">
@@ -23,9 +22,9 @@
                     <th>IQR</th>
                     <th>Exposures</th>
                     <th>OR</th>
-                    </tr>
+                  </tr>
 
-                    <tr v-for="cohort, cohort_name in field_stat.cohorts">
+                  <tr v-for="cohort, cohort_name in field_stat.cohorts">
                     <td>{{ cohort_name }}</td>
                     <td>{{ cohort.n }}</td>
                     <td>{{ cohort.mean | numeric(precision) }}</td>
@@ -36,24 +35,26 @@
                     <td>{{ cohort.ratio | numeric(precision)  }}</td>
                   </tr>
                   
-                  <tr>
-                    <td>Cohort Comparison</td>
-                    <td>{{ field_stat.comparison.n }}</td>
-                    <td>{{ field_stat.comparison.mean | numeric(precision) }}</td>
-                    <td>{{ field_stat.comparison.std | numeric(precision) }}</td>
-                    <td>{{ field_stat.comparison.median | numeric(precision) }}</td>
-                    <td>{{ field_stat.comparison.iqr | numeric(precision) }}</td>
+                  <tr><th colspan="5">Cohort Difference</th></tr>
+                  <tr v-for="stat, cohort_pair in field_stat.comparison">
+                    <td>{{ cohort_pair }}</td>
                     <td>&nbsp;</td>
-                    <td>{{ field_stat.comparison.OR | numeric(precision) }}</td>
+                    <td>{{ stat.mean | numeric(precision) }}</td>
+                    <td>{{ stat.std | numeric(precision) }}</td>
+                    <td>{{ stat.median | numeric(precision) }}</td>
+                    <td>{{ stat.iqr | numeric(precision) }}</td>
+                    <td>&nbsp;</td>
+                    <td>{{ stat.OR | numeric(precision) }}</td>
                   </tr>
                   
-                  <tr>
-                    <td>Matched Pairs</td>
-                    <td>{{ field_stat.matched_pairs.n }}</td>
-                    <td>{{ field_stat.matched_pairs.mean | numeric(precision) }}</td>
-                    <td>{{ field_stat.matched_pairs.std | numeric(precision) }}</td>
-                    <td>{{ field_stat.matched_pairs.median | numeric(precision) }}</td>
-                    <td>{{ field_stat.matched_pairs.iqr | numeric(precision) }}</td>
+                  <tr><th colspan="5">Matched Pairs</th></tr>
+                  <tr v-for="stat, cohort_pair in field_stat.matched_pairs">
+                    <td>{{ cohort_pair }}</td>
+                    <td>{{ stat.n }}</td>
+                    <td>{{ stat.mean | numeric(precision) }}</td>
+                    <td>{{ stat.std | numeric(precision) }}</td>
+                    <td>{{ stat.median | numeric(precision) }}</td>
+                    <td>{{ stat.iqr | numeric(precision) }}</td>
                     <td></td>
                   </tr> 
 
@@ -64,36 +65,26 @@
             </div>        
           </div>
 
-          <div key="cohorts" class="panel" v-show="activePanel=='cohort'">
-
-            <h4>Label of analysis</h4>
-            <input name="new_cohort" type="text" placeholder="SUMO name" ref="name" v-model="name"> 
-            <p/>
-            <div v-show="error" class="alert-danger">{{ error }}</div>
-
-            <h4>Cohorts</h4>
-            <input type="text" style="font-size:large" v-model="cohort1" placeholder="Cohort 1">
-
-            <input type="text" style="font-size:large" v-model="cohort2" placeholder="Cohort 2">
-            
-            <button name="save" type="button" class="btn-success" @click="save">Save</button>
-          </div>
-
           <div key="pairs" class="panel" v-show="activePanel=='pairs'">
+            <h4>Cohorts</h4>
+            <input type="text" style="font-size:large;width:90%" v-model="cohorts" placeholder="Enter cohort labels separated by spaces eg A, B">
             <p/>
             <h4>Field of analysis</h4>
             <input style="font-size:large; width:90%" v-model="foa" placeholder="eg. Person.year_of_birth"></input>
             <p/>
-            Precision/rounding <br/><input type="number" placeholder="decimal places" v-model="precision" @blur="roundPrecision">
-            <p/>
+            
+            <p>&nbsp;</p>
 
-            Exposure Level <br/><input type="text" style="width:90%" placeholder="category name or threshold value" v-model="exposure_level">
-            <p/>
-            Distribution Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="distribution threshold values separated by commas eg, 50, 100, 150">
-            <p/>
+            <p>Exposure Level <br/><input type="text" style="width:90%" placeholder="category name or threshold value" v-model="exposure_level"></p>
+
+            <p>Distribution Levels <br/><input type="text" v-model="categories" style="width:90%" placeholder="distribution threshold values separated by commas eg, 50, 100, 150">
+            </p>
+
+            <p>Precision/rounding <br/><input type="number" placeholder="decimal places" v-model="precision" @blur="roundPrecision"></p>
             <button name="save" type="button" class="btn-success" @click="save">Save</button>
             <p/>
             
+            <p>&nbsp;</p>
             <h3>OMOP Fields</h3>
 
             <div v-if="!schema">Loading...</div>
@@ -107,7 +98,11 @@
           </div>
           
         </transition-group>
-        <canvas id="myChart" v-show="activePanel=='summary'" width="100%" height="30vh"></canvas>
+        <canvas id="myChart" v-show="activePanel=='summary' && chartData.length > 0" width="100%" height="30vh"></canvas>
+        
+        <div v-show="activePanel=='summary' && chartData.length > 0">
+          <button class="btn-secondary" @click="updateChartCohort('total')">All Cohorts</button><button class="btn-secondary" v-for="cohort in cohortList" @click="updateChartCohort(cohort)">{{ cohort }}</button>
+        </div>
     </div>
 </template>
 
@@ -123,8 +118,8 @@
     props: ["projectId", "id"],    
     data: function(){
       return {
-        cohort1: '',
-        cohort2: '',
+        cohorts: '',
+        chartCohort: 'total',
         categories: '',
         exposure_level: '', 
         name: '', 
@@ -171,22 +166,26 @@
     },
     computed: {
         chartLabels: function(){
-          if(this.distribution == null || !Object.keys(this.distribution).length){
+          if(this.distribution == null){
             return []
 
           } else {
             var fieldname = Object.keys(this.distribution)[0]
-            var field_category = this.distribution[fieldname]
+            var field_category = this.distribution[fieldname][this.chartCohort]
             return field_category.map(x => { return x[0]})
           }
         },
         chartData: function(){
-          if(this.distribution == null || !Object.keys(this.distribution).length){
+          if(!this.distribution){
             return []
           } else {
             var fieldname = Object.keys(this.distribution)[0]
-            var field_category = this.distribution[fieldname]
-            return field_category.map(x => {return x[1]})
+            var field_category = this.distribution[fieldname][this.chartCohort]
+            if(field_category){
+              return field_category.map(x => {return x[1]})
+            } else {
+              return []
+            }
             
           }
         },
@@ -197,19 +196,13 @@
           if(!this.cohorts){
             return []
           } else {
-            try {
-              return this.cohorts.split(',').map(cohort => { return cohort.trim()})
-            } catch(err) {
-              console.log(err)
-              return []
-            }
+            return this.cohorts.split(',').map( x => x.trim() )
           }
         }
     },
     methods: {
       save(){
-          var cohorts = this.cohort1 + ', ' + this.cohort2
-          var saveObject = { cohorts: cohorts, foa: this.foa, precision: this.precision, 
+          var saveObject = { cohorts: this.cohorts, foa: this.foa, precision: this.precision, 
             name: this.name, _id: this.id, exposure_level: this.exposure_level, 
             categories: this.categories }
 
@@ -220,6 +213,14 @@
           }).catch(error => {
             this.error = error;
           });
+      },
+      updateChartCohort(cohort){
+        console.log(cohort)
+        this.chartCohort = cohort
+        myChart.data.datasets[0].data = this.chartData
+        myChart.data.labels = this.chartLabels
+        myChart.update()
+
       },
       showAddList(column){
         if(column.toLowerCase() == this.foa.toLowerCase()){
@@ -245,11 +246,10 @@
       load(){
         axios.get(this.configsURL + '/' + this.id).then( 
             response => { 
+                console.log(response.data)
                 this.id = response.data._id
                 if(response.data.cohorts){
-                  var cohorts = response.data.cohorts.split(',')
-                  this.cohort1 = cohorts[0].trim()
-                  this.cohort2 = cohorts[1].trim()
+                  this.cohorts = response.data.cohorts
                   this.categories = response.data.categories
                   this.exposure_level = response.data.exposure_level
                   this.precision = response.data.precision

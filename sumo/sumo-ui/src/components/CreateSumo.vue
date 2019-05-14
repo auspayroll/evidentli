@@ -3,22 +3,18 @@
 
         <h1>New Sumo</h1>
         <p/>
-   
           <div key="cohort_panel" class="panel">
-
             <h4>Label of analysis</h4>
             <input name="new_cohort" type="text" placeholder="SUMO name" ref="name" v-model="name"> 
             <p/>
             <div v-show="error" class="alert-danger">{{ error }}</div>
             
             <h4>Cohorts</h4>
-            <input type="text" style="font-size:large" v-model="cohort1" placeholder="Cohort 1">
-
-            <input type="text" style="font-size:large" v-model="cohort2" placeholder="Cohort 2">
+            <input type="text" style="font-size:large;width:90%" v-model="cohorts" placeholder="Enter cohort labels seperated by commas eg. A, B">
 
             <p/>
             <h4>Field of analysis</h4>
-            <input style="font-size:large; width:90%" v-model="foa" placeholder="eg. Person.year_of_birth"></input>
+            <input style="font-size:large;width:90%" v-model="foa" placeholder="eg. Person.year_of_birth"></input>
 
             <p/>
 
@@ -36,9 +32,7 @@
                 <button class="btn-info float-right" @click="addFoa(table_name + '.' + column.name)">Add</button>
               </div>
             </div>
-
           </div>      
-  
     </div>
 
 </template>
@@ -51,8 +45,7 @@
     props: ["projectId"],    
     data: function(){
       return {
-        cohort1: '',
-        cohort2: '',
+        cohorts: '',
         foa: '',
         name: '', 
         error: '',
@@ -89,8 +82,7 @@
     },
     methods: {
       save(){
-            var cohorts = this.cohort1 + ', ' + this.cohort2
-            var saveObject = { cohorts: cohorts, foa: this.foa, 
+            var saveObject = { cohorts: this.cohorts, foa: this.foa, 
               name: this.name, exposure_level: this.exposure_level, categories: this.categories }
             axios.post(this.configsURL, saveObject).then( response => {
               var _id = response.data._id
@@ -110,7 +102,6 @@
         })
       },
       showAddList(column){
-        console.log('here')
         if(column.toLowerCase() == this.foa.toLowerCase()){
           return false
         }
