@@ -51,9 +51,9 @@ class OMOP(object):
 				query = query + "where %s " % where
 
 		if where and all_in:
-			query = query + "and person_id in " + str(all_in).replace('[','(').replace(']',')')
+			query = query + "and person_id in " + '(' + ','.join(all_in) + ')' 
 		elif all_in:
-			query = query + "where person_id in " + str(all_in).replace('[','(').replace(']',')')
+			query = query + "where person_id in " + '(' + ','.join(all_in) + ')' 
 
 		if order_by:
 			query = query + " order by %s " % order_by
@@ -63,6 +63,7 @@ class OMOP(object):
 
 		if offset and type(offset) in (str, int):
 			query = query + " offset %s " % offset
+		print(query)
 		self.query = query
 
 	def execute(self):
