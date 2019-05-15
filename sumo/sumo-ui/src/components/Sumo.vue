@@ -215,7 +215,6 @@
           });
       },
       updateChartCohort(cohort){
-        console.log(cohort)
         this.chartCohort = cohort
         myChart.data.datasets[0].data = this.chartData
         myChart.data.labels = this.chartLabels

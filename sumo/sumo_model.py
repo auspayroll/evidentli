@@ -1,6 +1,5 @@
 import uuid
 from random import randint
-
 from orm.model import Model
 from orm.patient import Patient
 from orm import omop
@@ -265,14 +264,6 @@ class Sumo(Model):
     @property
     def _field_list(self):
         return [x.strip() for x in self.foa.split(',')]
-
-        """
-        l = []
-        for k, vl in self._field_dict.items():
-            for v in vl:
-                l.append("%s__%s" % (k,v))
-        return l
-        """
 
 
    
