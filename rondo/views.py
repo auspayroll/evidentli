@@ -79,11 +79,14 @@ def flowfile(project_id, rondo_id):
     rondo = Rondo.get(project_id=project_id, id=rondo_id)
     if rondo.random:
         rondo.allocate_random_cohort(patient, force=True)
-        json["cohort"] = patient.cohort
-        json["pair_id"] = patient.pair_id
+        if patient.cohort:
+            json["cohort"] = patient.cohort
+        if patient.pair_id:
+            json["pair_id"] = patient.pair_id
     else:
         rondo.match_patient(patient)
-        json['cohort'] = patient.cohort
+        if patient.cohort:
+            json['cohort'] = patient.cohort
     return jsn(json)
 
 
