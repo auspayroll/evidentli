@@ -22,7 +22,12 @@ class Model(object):
 					raise AttributeError("%s is not in allowable fields %s" % (k, str(list(_fields.keys()))))
 				_type = _fields.get(k)
 				if _type:
-					if type(v) is not _type:
+					if _type is str:
+						try:
+							v = str(v)
+						except:
+							raise TypeError("%s should be of type %s" % (k, _type))
+					elif type(v) is not _type:
 						raise TypeError("%s should be of type %s" % (k, _type))
 
 			setattr(self, k, v)
@@ -61,6 +66,26 @@ class Model(object):
 			return record
 		else: 
 			return cls.create(**record)
+
+
+	@classmethod
+	def upsert(cls, project_id, defaults = {}, *args, **kwargs):
+		if not kwargs:
+			raise Exception("upsert error: no match keys specified")
+
+		matches = cls.filter(_project_id, **kwargs)
+		if not matches:
+			fields = defaults.update(kwargs)
+			model = cls(project_id=_project_id, **fields)
+			model.save()
+			return model
+		elif len(matches) == 1:
+			match = matches[0]
+			match.update(**defaults)
+			return match
+		else:
+			raise Exception("upsert error: More than 1 object matched")
+
 			
 
 	@classmethod
@@ -116,6 +141,8 @@ class Model(object):
 			self._id = valid
 			self._field_updates.clear()
 			return self._id
+		else:
+			return False
 
 
 	def update(self, **kwargs):
@@ -124,6 +151,6 @@ class Model(object):
 		assert self._id and self._project_id
 		for k, v in kwargs.items():
 			setattr(self, k, v)
-		self.save()
+		return self.save()
 
 

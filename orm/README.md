@@ -83,6 +83,27 @@ Models can be queried using the class method ``filter`` which receive keyword ar
 
 In this example, a list of patients whose lastname is `Smithers` __and__ age is `29`. Currently there is only provision to support string values, and logical OR operations are not supported. This may change in the future. 
 
+
+### Including OMOP fields
+
+Fields from OMOP tables can be included in querying records by including the `omop` keywword
+
+``> Patient.filter(lastname="Smithers", age="29", omop='Person, Condition_occurance') ``
+
+The `omop` keyword option takes either a list of OMOP table names or a string of table names seperated by commas. Note that OMOP tables specified must have a corresponding foreign key column for the model, eg. for the Patient model in the above query, both Person and Condition_occurance tables must have a `person_id` field (the Patient model is based on the OMOP `person` table).
+
+The `filter` query, firstly queries the Piano `Crucible` database, applies any filters specified as keyword arguments, and then includes fields from the OMOP database if there is `omop` keyword option. OMOP field values can be obtained from each returned model object via an attribute made up of the table name and fieldname seperated by an underscore: 
+
+`modelname.tablename__fieldname`
+
+For example, 
+
+`patients = Patient.filter(lastname="Smithers", age="29", omop='Person')`
+
+`patients[0].person__day_of_birth`
+
+will access the patient's day of birth from the OMOP `person` table. All fields from `person` table will be included if the `person` table is specified in the `omop` keyword option. 
+
 ### ToDo
 * Logical OR operations
 * `limit` keyword to limit the number of fetched records
@@ -106,6 +127,18 @@ In this example, a list of patients whose lastname is `Smithers` __and__ age is 
   ``> updates = { "firstname" = "Kim", middlename="Jong", lastname="Un"}``
 
   ``> patient.update(**updates)``
+
+---
+
+## Upserts
+
+If a record needs to be created or updated according to some criteria, and you don't know if that record already exists, the `upsert` method can be used to perform this task in a single operation. 
+
+``> Patient.upsert(firstname="Harry", lastname="Trueman", defaults=dict(cohort="A"))``
+
+The model object is matched according to keyword parameters (excluding `defaults`). Note that the resulting match should not yield more than single record, otherwise an exception will be raised. If there is no match, a new record will be created. 
+
+The `defaults` keyword accepts a dictionary will field values that should be updated. In the above example, the patient record "Harry Trueman" will have the cohort set to A. 
 
 ---
 
