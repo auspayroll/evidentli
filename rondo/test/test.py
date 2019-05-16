@@ -172,7 +172,7 @@ class TestRondo(unittest.TestCase):
         requests.post(url, json=[config])
 
         # test api
-        url = "%s/projects/%s/rondo/%s/flowfile" % ("http://localhost:5012", self.project_id_api, config_id)
+        url = "%s/rondo/api/projects/%s/rondo/%s/flowfile" % (PIANO_API, self.project_id_api, config_id)
         patient = self.patients[0]
         patient["test_key"] = "test_val"
         r = requests.post(url, json=patient)
@@ -211,7 +211,7 @@ class TestRondo(unittest.TestCase):
         requests.post("%s/projects/%s/patients" % (PIANO_API, self.project_id_api), json=patients)
 
         # test api
-        url = "%s/projects/%s/rondo/%s/flowfile" % ("http://localhost:5012", self.project_id_api, config_id)
+        url = "%s/rondo/api/projects/%s/rondo/%s/flowfile" % (PIANO_API, self.project_id_api, config_id)
         patient = patients[1]
         patient["test_key"] = "test_val"
         r = requests.post(url, json=patient)
