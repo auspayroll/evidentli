@@ -1,5 +1,5 @@
 from rondo import app
-from .rondo_model import Rondo
+from rondo_model import Rondo
 from flask import jsonify as jsn
 from flask import request
 from functools import wraps
@@ -79,11 +79,13 @@ def flowfile(project_id, rondo_id):
     rondo = Rondo.get(project_id=project_id, id=rondo_id)
     if rondo.random:
         rondo.allocate_random_cohort(patient, force=True)
+        json["cohort"] = patient.cohort
         json["pair_id"] = patient.pair_id
     else:
         rondo.match_patient(patient)
         json['cohort'] = patient.cohort
     return jsn(json)
+
 
 @app.route('/projects/<project_id>/schema', methods=['GET', 'OPTIONS'])
 @cors
