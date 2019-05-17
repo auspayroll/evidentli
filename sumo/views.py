@@ -1,5 +1,5 @@
 from sumo import app
-from .sumo_model import Sumo
+from sumo_model import Sumo
 from flask import jsonify as jsn
 from flask import request
 from functools import wraps
