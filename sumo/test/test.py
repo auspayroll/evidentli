@@ -237,7 +237,7 @@ class TestSumo(unittest.TestCase):
         requests.post("%s/projects/%s/patients" % (PIANO_API, self.project_id_api), json=patients)
 
         # test api
-        url = "%s/projects/%s/sumo/%s/calc_stats" % ("http://localhost:5011", self.project_id_api, config_id)
+        url = "%s/sumo/api/projects/%s/sumo/%s/calc_stats" % (PIANO_API, self.project_id_api, config_id)
         r = requests.get(url)
         self.assertEquals(r.status_code, requests.codes.ok)
         self.assertTrue(r.content)
