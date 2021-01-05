@@ -10,7 +10,7 @@
     "build": "node build/build.js && cp -f dist/index.html ../static/index.html && cp -f dist/static/css/* ../static/css && cp -f dist/static/js/* ../static/js"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "chart.js": "^2.8.0",
     "numeral": "^2.0.6",
     "shlex": "^2.0.1",
